@@ -1,0 +1,1 @@
+/usr/bin/c++ -g CMakeFiles/tst_motor_cntl.dir/src/tst_motor_cntl.cpp.o -o tst_motor_cntl  -Wl,-rpath,/usr/local/lib: /usr/local/lib/libpigpio.so /usr/local/lib/libpigpiod_if.so /usr/local/lib/libpigpiod_if2.so -lpthread -lrt 

@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/home/aaron/ws/rr_pi4B_driver/build",
+  "command": "/usr/bin/c++   -g -std=gnu++17 -Wall -Wextra -Wpedantic -o CMakeFiles/tst_motor_cntl.dir/src/tst_motor_cntl.cpp.o -c /home/aaron/ws/rr_pi4B_driver/src/tst_motor_cntl.cpp",
+  "file": "/home/aaron/ws/rr_pi4B_driver/src/tst_motor_cntl.cpp",
+  "output": "CMakeFiles/tst_motor_cntl.dir/src/tst_motor_cntl.cpp.o"
+},
+{
+  "directory": "/home/aaron/ws/rr_pi4B_driver/build",
+  "command": "/usr/bin/c++   -g -std=gnu++17 -Wall -Wextra -Wpedantic -o CMakeFiles/tst_motor_enc.dir/src/tst_motor_enc.cpp.o -c /home/aaron/ws/rr_pi4B_driver/src/tst_motor_enc.cpp",
+  "file": "/home/aaron/ws/rr_pi4B_driver/src/tst_motor_enc.cpp",
+  "output": "CMakeFiles/tst_motor_enc.dir/src/tst_motor_enc.cpp.o"
+}
+]

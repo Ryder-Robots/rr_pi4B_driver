@@ -1,0 +1,70 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-019f6a134cb52dd00b4a.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.8"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "motor_tests",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "tst_motor_cntl::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-tst_motor_cntl-Debug-4c530008877c0ff14917.json",
+					"name" : "tst_motor_cntl",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "tst_motor_enc::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-tst_motor_enc-Debug-c0413ed23a9752c64de1.json",
+					"name" : "tst_motor_enc",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/aaron/ws/rr_pi4B_driver/build",
+		"source" : "/home/aaron/ws/rr_pi4B_driver"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}

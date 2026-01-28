@@ -237,3 +237,256 @@ TEST  9.2  PASS (run script/script status: 201)
 TEST  9.3  PASS (run/stop script/script status: 410)
 TEST  9.4  PASS (delete script: 0)
 ```
+
+### x_pigs
+
+Results showed that in one instanfe no more CBs where available for waveforms, this may be due to cleanup issue
+for the moment ignoring:
+
+```
+Testing pigpio pigs
+pigpio version 79
+BC1 ok
+BC2 ok
+BR1 ok
+BR2 ok
+BS1 ok
+BS2 ok
+HELP ok
+HWVER ok
+MICS ok
+MILS ok
+MODEG ok
+MODES ok
+NO(0) ok
+NB(0) ok
+NP(0) ok
+NC(0) ok
+PFG-a ok
+PFG-b ok
+PFS-a ok
+PFS-b ok
+PRG-a ok
+PRG-b ok
+PROC(0) ok
+PROCR(0) ok
+PROCP(0) ok
+PROCS(0) ok
+PROCD(0) ok
+PRRG ok
+PRS-a ok
+PRS-b ok
+PRS-c ok
+PRS-d ok
+PUD-a ok
+PUD-b ok
+PUD-c ok
+PUD-d ok
+PUD-e ok
+PWM-a ok
+GDC-a ok
+PWM-b ok
+GDC-b ok
+PWM-c ok
+GDC-c ok
+PWM-d ok
+READ-a ok
+READ-b ok
+READ-c ok
+READ-d ok
+READ-e ok
+SERVO-a ok
+GPW-a ok
+SERVO-b ok
+GPW-b ok
+SERVO-c ok
+GPW-c ok
+SERVO-d ok
+SLR-a ok
+SLR-b ok
+SLR-c ok
+SLR-d ok
+WVCRE ok
+SLR-e ok
+SLR-f ok
+SLR-g ok
+TICK ok
+TRIG-a ok
+TRIG-b ok
+TRIG-c ok
+TRIG-d ok
+WDOG-a ok
+WDOG-b ok
+WRITE-a ok
+WRITE-b ok
+WRITE-c ok
+WRITE-d ok
+WVCLR ok
+WVAS ok
+WVAG ok
+WVCRE ok
+WVTX ok
+WVBSY-a ok
+WVBSY-b ok
+WVHLT ok
+WVBSY-c ok
+WVTXR ok
+WVBSY-d ok
+WVHLT ok
+WVBSY-e ok
+WVSC-a ok
+WVSC-b ok
+WVSC-c ok
+WVSM-a ok
+WVSM-b ok
+WVSM-c ok
+WVSP-a ok
+WVSP-b ok
+WVSP-c ok
+WVCAP-a ok
+WVCAP-b ok
+WVCAP-c ok
+ERROR: No more CBs for waveform
+WVCAP-d ok
+WVCAP-e ok
+```
+
+### ./x_pipe 
+
+Results:
+
+```
+Testing pigpio pipe I/F
+pigpio version 79
+BC1 ok
+BC2 ok
+BR1 ok
+BR2 ok
+BS1 ok
+BS2 ok
+HELP-a ok
+HELP-b ok
+HWVER ok
+MICS ok
+MILS ok
+MODEG ok
+MODES ok
+NO(0) ok
+NB(0) ok
+NP(0) ok
+NC(0) ok
+PFG-a ok
+PFG-b ok
+PFS-a ok
+PFS-b ok
+PRG-a ok
+PRG-b ok
+PROC(0) ok
+PROCR(0) ok
+PROCP(0) ok
+PROCS(0) ok
+PROCD(0) ok
+PRRG ok
+PRS-a ok
+PRS-b ok
+PRS-c ok
+PRS-d ok
+PUD-a ok
+PUD-b ok
+PUD-c ok
+PUD-d ok
+PUD-e ok
+PWM-a ok
+GDC-a ok
+PWM-b ok
+GDC-b ok
+PWM-c ok
+GDC-c ok
+PWM-d ok
+READ-a ok
+READ-b ok
+READ-c ok
+READ-d ok
+READ-e ok
+SERVO-a ok
+GPW-a ok
+SERVO-b ok
+GPW-b ok
+SERVO-c ok
+GPW-c ok
+SERVO-d ok
+SLR-a ok
+SLR-b ok
+SLR-c ok
+SLR-d ok
+WVCRE ok
+SLR-e ok
+SLR-f ok
+SLR-g ok
+TICK ok
+TRIG-a ok
+TRIG-b ok
+TRIG-c ok
+TRIG-d ok
+WDOG-a ok
+WDOG-b ok
+WRITE-a ok
+WRITE-b ok
+WRITE-c ok
+WRITE-d ok
+WVCLR ok
+WVAS ok
+WVAG ok
+WVCRE ok
+WVTX ok
+WVBSY-a ok
+WVBSY-b ok
+WVHLT ok
+WVBSY-c ok
+WVTXR ok
+WVBSY-d ok
+WVHLT ok
+WVBSY-e ok
+WVSC-a ok
+WVSC-b ok
+WVSC-c ok
+WVSM-a ok
+WVSM-b ok
+WVSM-c ok
+WVSP-a ok
+WVSP-b ok
+WVSP-c ok
+```
+
+## Motor Testing 
+
+The following was seen using tst_motor_simple.bash
+
+```
+=== Dual Motor Test with Error Checking ===
+Configuring pins...
+✅ Pins configured
+Test 1: Both motors forward, 70% speed
+Test 2: Both motors forward, 85% speed
+Test 3: Motor A forward, Motor B reverse
+Test 4: Stop all motors
+✅ All tests complete
+aaron@mazebot:~/ws/rr_pi4B_driver$ ./scripts/tst_motor_simple.bash 
+=== Dual Motor Test with Error Checking ===
+Configuring pins...
+✅ Pins configured
+Test 1: Both motors forward, 60% speed
+Test 2: Both motors forward, 85% speed
+Test 3: Motor A forward, Motor B reverse
+Test 4: Stop all motors
+✅ All tests complete
+aaron@mazebot:~/ws/rr_pi4B_driver$ ./scripts/tst_motor_simple.bash 
+=== Dual Motor Test with Error Checking ===
+Configuring pins...
+✅ Pins configured
+Test 1: Both motors forward, 65% speed
+Test 2: Both motors forward, 85% speed
+Test 3: Motor A forward, Motor B reverse
+Test 4: Stop all motors
+✅ All tests complete
+```
