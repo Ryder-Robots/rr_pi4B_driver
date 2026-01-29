@@ -84,6 +84,7 @@ target_link_libraries(tst_motor_cntl
 add_executable(tst_motor_enc
   src/tst_motor_enc.cpp
 )
+target_compile_options(tst_motor_enc PRIVATE -Wimplicit-fallthrough)
 
 target_link_libraries(tst_motor_enc
   ${pigpio_LIBRARIES}
