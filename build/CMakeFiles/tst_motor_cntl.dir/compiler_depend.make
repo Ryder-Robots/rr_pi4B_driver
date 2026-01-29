@@ -201,7 +201,8 @@ CMakeFiles/tst_motor_cntl.dir/src/tst_motor_cntl.cpp.o: /home/aaron/ws/rr_pi4B_d
   /usr/lib/gcc/aarch64-linux-gnu/13/include/stdarg.h \
   /usr/lib/gcc/aarch64-linux-gnu/13/include/stddef.h \
   /usr/lib/gcc/aarch64-linux-gnu/13/include/stdint.h \
-  /usr/local/include/pigpio.h
+  /usr/local/include/pigpio.h \
+  /usr/local/include/pigpiod_if2.h
 
 
 /usr/local/include/pigpio.h:
@@ -363,6 +364,8 @@ CMakeFiles/tst_motor_cntl.dir/src/tst_motor_cntl.cpp.o: /home/aaron/ws/rr_pi4B_d
 /usr/include/ctype.h:
 
 /usr/include/aarch64-linux-gnu/bits/endianness.h:
+
+/usr/local/include/pigpiod_if2.h:
 
 /usr/include/aarch64-linux-gnu/bits/types/mbstate_t.h:
 

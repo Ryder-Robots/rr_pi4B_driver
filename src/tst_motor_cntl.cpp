@@ -22,7 +22,7 @@
 
 #include <cstddef>
 #include <iostream>
-#include <pigpio.h>
+#include <pigpiod_if2.h> 
 #include <thread>
 
 #define OK 0
@@ -64,7 +64,13 @@ class Motor {
     * be used at later stages.
     *
     */
-    CallbackReturn on_configure(uint pwm_pin, uint dir_pin) {
+    CallbackReturn on_configure(uint pwm_pin, uint dir_pin, int pi) {
+
+        if (pi < 0) {
+            std::cout << "ERROR: pi daemon is not correct\n";
+            return CallbackReturn::FAILURE;
+        }
+        pi_ = pi;
 
         switch(pwm_pin) {
             case 12:
@@ -93,7 +99,7 @@ class Motor {
     // create links with hardware. Perform error checking, and fail if something goes wrong.
     CallbackReturn on_activate() {
 
-        if (gpioSetMode(dir_pin_, PI_OUTPUT) == PI_BAD_GPIO) {
+        if (set_mode(pi_, dir_pin_, PI_OUTPUT) == PI_BAD_GPIO) {
             std::cout << "ERROR: pin " << dir_pin_ << "returned PI_BAD_GPIO\n";
             return CallbackReturn::FAILURE;
         }
@@ -101,14 +107,14 @@ class Motor {
 
         // set to ALT5 for PWM hardware output.
         // could add support for soft PWM, but not in this test
-        if (gpioSetMode(pwm_pin_, PI_ALT5) == PI_BAD_GPIO) {
+        if (set_mode(pi_, pwm_pin_, PI_ALT5) == PI_BAD_GPIO) {
             std::cout << "ERROR: pin " << pwm_pin_ << "returned PI_BAD_GPIO\n";
             return CallbackReturn::FAILURE;
         }
 
         {
             int r = OK;
-            if ((r = gpioWrite(dir_pin_, LOW)) != OK) {
+            if ((r = gpio_write(pi_, dir_pin_, LOW)) != OK) {
                 switch(r) {
                     case PI_BAD_GPIO:
                         std::cout << "ERROR: pin " << dir_pin_ << "returned PI_BAD_GPIO\n";
@@ -136,7 +142,7 @@ class Motor {
 
         {
             int r = OK;
-            if ((r = gpioWrite(dir_pin_, LOW)) != OK) {
+            if ((r = gpio_write(pi_, dir_pin_, LOW)) != OK) {
                 // note fallthrough is delibrate here
                 switch(r) {
                     case PI_BAD_GPIO:
@@ -162,7 +168,7 @@ class Motor {
     
     int set_direction(DIRECTION dir) {
         int r = OK;
-        if ((r = gpioWrite(dir_pin_, dir)) != OK) {
+        if ((r = gpio_write(pi_, dir_pin_, dir)) != OK) {
             switch(r) {
                 case PI_BAD_GPIO:
                     std::cout << "ERROR: pin " << dir_pin_ << "returned PI_BAD_GPIO\n";
@@ -182,7 +188,8 @@ class Motor {
 
     private:
     uint pwm_pin_ = 0; // set speed of the pin
-    uint dir_pin_ = 0; // set direction. 
+    uint dir_pin_ = 0; // set direction.
+    int pi_ = -1;
 
     // TC78H660FTG have an adjustable OSCM which means that the frequency can be anything, and since 
     // 
@@ -196,7 +203,7 @@ class Motor {
     const int DUTY_OFFSET = 10000;
 
     int set_pwm(int freq, int duty) {
-        int r = gpioHardwarePWM(pwm_pin_, freq, duty*DUTY_OFFSET);
+        int r = hardware_PWM(pi_, pwm_pin_, freq, duty*DUTY_OFFSET);
         switch(r) {
             // note fallthrough is delibrate here
             case OK:
@@ -225,20 +232,21 @@ class Motor {
 
 int main() {
 
-    if (gpioInitialise() < 0) {
-        std::cout << "unable to initalize program\n";
+    int pi = pigpio_start(NULL, NULL);
+    if (pi < 0) {
+        std::cout << "Failed to connect to pigpiod\n";
         return 1;
     }
 
     Motor motor_a;
-    if (motor_a.on_configure(PWM_A, DIR_A) == CallbackReturn::FAILURE) {
-         gpioTerminate();
+    if (motor_a.on_configure(PWM_A, DIR_A, pi) == CallbackReturn::FAILURE) {
+        pigpio_stop(pi);
         std::cout << "exiting program\n";
         return 1;
     }
 
     if (motor_a.on_activate() == CallbackReturn::FAILURE) {
-        gpioTerminate();
+        pigpio_stop(pi); 
         std::cout << "exiting program\n";
         return 1;
     }
@@ -253,6 +261,6 @@ int main() {
     motor_a.on_shutdown();
 
     // motor_ctl.on_shutdown();
-    gpioTerminate();
+    pigpio_stop(pi); 
     return 0;
 }
