@@ -95,16 +95,17 @@ target_compile_options(tst_motor_cntl PRIVATE -Wimplicit-fallthrough)
 # Build tst_motor_enc executable
 ################################################################################
 # To be developed.
-# add_executable(tst_motor_enc
-#   src/tst_motor_enc.cpp
-# )
-# target_compile_options(tst_motor_enc PRIVATE -Wimplicit-fallthrough)
+add_executable(tst_motor_enc
+  src/tst_motor_enc.cpp
+  src/motor.cpp
+)
+target_compile_options(tst_motor_enc PRIVATE -Wimplicit-fallthrough)
 
-# target_link_libraries(tst_motor_enc
-#   ${pigpio_LIBRARIES}
-#   pthread
-#   rt
-# )
+target_link_libraries(tst_motor_enc
+  ${pigpio_LIBRARIES}
+  pthread
+  rt
+)
 
 ################################################################################
 # Install (optional)

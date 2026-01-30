@@ -142,12 +142,26 @@ tst_motor_ctl_pigpiod/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_ctl_pigpiod.dir/build.make CMakeFiles/tst_motor_ctl_pigpiod.dir/build
 .PHONY : tst_motor_ctl_pigpiod/fast
 
+#=============================================================================
+# Target rules for targets named tst_motor_enc
+
+# Build rule for target.
+tst_motor_enc: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tst_motor_enc
+.PHONY : tst_motor_enc
+
+# fast build rule for target.
+tst_motor_enc/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_enc.dir/build.make CMakeFiles/tst_motor_enc.dir/build
+.PHONY : tst_motor_enc/fast
+
 src/motor.o: src/motor.cpp.o
 .PHONY : src/motor.o
 
 # target to build an object file
 src/motor.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_ctl_pigpiod.dir/build.make CMakeFiles/tst_motor_ctl_pigpiod.dir/src/motor.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_enc.dir/build.make CMakeFiles/tst_motor_enc.dir/src/motor.cpp.o
 .PHONY : src/motor.cpp.o
 
 src/motor.i: src/motor.cpp.i
@@ -156,6 +170,7 @@ src/motor.i: src/motor.cpp.i
 # target to preprocess a source file
 src/motor.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_ctl_pigpiod.dir/build.make CMakeFiles/tst_motor_ctl_pigpiod.dir/src/motor.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_enc.dir/build.make CMakeFiles/tst_motor_enc.dir/src/motor.cpp.i
 .PHONY : src/motor.cpp.i
 
 src/motor.s: src/motor.cpp.s
@@ -164,6 +179,7 @@ src/motor.s: src/motor.cpp.s
 # target to generate assembly for a file
 src/motor.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_ctl_pigpiod.dir/build.make CMakeFiles/tst_motor_ctl_pigpiod.dir/src/motor.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_enc.dir/build.make CMakeFiles/tst_motor_enc.dir/src/motor.cpp.s
 .PHONY : src/motor.cpp.s
 
 src/tst_motor_cntl.o: src/tst_motor_cntl.cpp.o
@@ -214,6 +230,30 @@ src/tst_motor_ctl_pigpiod.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_ctl_pigpiod.dir/build.make CMakeFiles/tst_motor_ctl_pigpiod.dir/src/tst_motor_ctl_pigpiod.cpp.s
 .PHONY : src/tst_motor_ctl_pigpiod.cpp.s
 
+src/tst_motor_enc.o: src/tst_motor_enc.cpp.o
+.PHONY : src/tst_motor_enc.o
+
+# target to build an object file
+src/tst_motor_enc.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_enc.dir/build.make CMakeFiles/tst_motor_enc.dir/src/tst_motor_enc.cpp.o
+.PHONY : src/tst_motor_enc.cpp.o
+
+src/tst_motor_enc.i: src/tst_motor_enc.cpp.i
+.PHONY : src/tst_motor_enc.i
+
+# target to preprocess a source file
+src/tst_motor_enc.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_enc.dir/build.make CMakeFiles/tst_motor_enc.dir/src/tst_motor_enc.cpp.i
+.PHONY : src/tst_motor_enc.cpp.i
+
+src/tst_motor_enc.s: src/tst_motor_enc.cpp.s
+.PHONY : src/tst_motor_enc.s
+
+# target to generate assembly for a file
+src/tst_motor_enc.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_enc.dir/build.make CMakeFiles/tst_motor_enc.dir/src/tst_motor_enc.cpp.s
+.PHONY : src/tst_motor_enc.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -224,6 +264,7 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... tst_motor_cntl"
 	@echo "... tst_motor_ctl_pigpiod"
+	@echo "... tst_motor_enc"
 	@echo "... src/motor.o"
 	@echo "... src/motor.i"
 	@echo "... src/motor.s"
@@ -233,6 +274,9 @@ help:
 	@echo "... src/tst_motor_ctl_pigpiod.o"
 	@echo "... src/tst_motor_ctl_pigpiod.i"
 	@echo "... src/tst_motor_ctl_pigpiod.s"
+	@echo "... src/tst_motor_enc.o"
+	@echo "... src/tst_motor_enc.i"
+	@echo "... src/tst_motor_enc.s"
 .PHONY : help
 
 

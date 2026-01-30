@@ -9,6 +9,9 @@
 #include <thread>
 #include <atomic>
 
+#include "motor.hpp"
+// #include "motor_encoder.hpp"
+
 
 #define PWM_A 18
 #define PWM_B 19

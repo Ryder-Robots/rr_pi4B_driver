@@ -16,5 +16,17 @@
   "command": "/usr/bin/c++   -g -std=gnu++17 -Wall -Wextra -Wpedantic -Wimplicit-fallthrough -o CMakeFiles/tst_motor_ctl_pigpiod.dir/src/motor.cpp.o -c /home/aaron/ws/rr_pi4B_driver/src/motor.cpp",
   "file": "/home/aaron/ws/rr_pi4B_driver/src/motor.cpp",
   "output": "CMakeFiles/tst_motor_ctl_pigpiod.dir/src/motor.cpp.o"
+},
+{
+  "directory": "/home/aaron/ws/rr_pi4B_driver/build",
+  "command": "/usr/bin/c++   -g -std=gnu++17 -Wall -Wextra -Wpedantic -Wimplicit-fallthrough -o CMakeFiles/tst_motor_enc.dir/src/tst_motor_enc.cpp.o -c /home/aaron/ws/rr_pi4B_driver/src/tst_motor_enc.cpp",
+  "file": "/home/aaron/ws/rr_pi4B_driver/src/tst_motor_enc.cpp",
+  "output": "CMakeFiles/tst_motor_enc.dir/src/tst_motor_enc.cpp.o"
+},
+{
+  "directory": "/home/aaron/ws/rr_pi4B_driver/build",
+  "command": "/usr/bin/c++   -g -std=gnu++17 -Wall -Wextra -Wpedantic -Wimplicit-fallthrough -o CMakeFiles/tst_motor_enc.dir/src/motor.cpp.o -c /home/aaron/ws/rr_pi4B_driver/src/motor.cpp",
+  "file": "/home/aaron/ws/rr_pi4B_driver/src/motor.cpp",
+  "output": "CMakeFiles/tst_motor_enc.dir/src/motor.cpp.o"
 }
 ]

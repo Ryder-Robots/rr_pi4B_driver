@@ -48,4 +48,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/tst_motor_cntl.dir/DependInfo.cmake"
   "CMakeFiles/tst_motor_ctl_pigpiod.dir/DependInfo.cmake"
+  "CMakeFiles/tst_motor_enc.dir/DependInfo.cmake"
   )
