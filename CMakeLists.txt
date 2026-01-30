@@ -67,12 +67,15 @@ include_directories(${pigpio_INCLUDE_DIRS})
 # Build tst_motor_cntl executable
 ################################################################################
 
+# Failed in testing.
 add_executable(tst_motor_cntl
     src/tst_motor_cntl.cpp
 )
 
+# Current implementation but needs sudo'r access
 add_executable(tst_motor_ctl_pigpiod
     src/tst_motor_ctl_pigpiod.cpp
+    src/motor.cpp
 )
 target_link_libraries(tst_motor_ctl_pigpiod
   ${pigpio_LIBRARIES}
@@ -91,25 +94,25 @@ target_compile_options(tst_motor_cntl PRIVATE -Wimplicit-fallthrough)
 ################################################################################
 # Build tst_motor_enc executable
 ################################################################################
+# To be developed.
+# add_executable(tst_motor_enc
+#   src/tst_motor_enc.cpp
+# )
+# target_compile_options(tst_motor_enc PRIVATE -Wimplicit-fallthrough)
 
-add_executable(tst_motor_enc
-  src/tst_motor_enc.cpp
-)
-target_compile_options(tst_motor_enc PRIVATE -Wimplicit-fallthrough)
-
-target_link_libraries(tst_motor_enc
-  ${pigpio_LIBRARIES}
-  pthread
-  rt
-)
+# target_link_libraries(tst_motor_enc
+#   ${pigpio_LIBRARIES}
+#   pthread
+#   rt
+# )
 
 ################################################################################
 # Install (optional)
 ################################################################################
 
-install(TARGETS tst_motor_cntl tst_motor_enc
-  DESTINATION bin
-)
+# install(TARGETS tst_motor_cntl tst_motor_enc
+#   DESTINATION bin
+# )
 
 ################################################################################
 # Print build info

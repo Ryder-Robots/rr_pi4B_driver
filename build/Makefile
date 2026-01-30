@@ -85,51 +85,6 @@ rebuild_cache:
 rebuild_cache/fast: rebuild_cache
 .PHONY : rebuild_cache/fast
 
-# Special rule for the target list_install_components
-list_install_components:
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Available install components are: \"Unspecified\""
-.PHONY : list_install_components
-
-# Special rule for the target list_install_components
-list_install_components/fast: list_install_components
-.PHONY : list_install_components/fast
-
-# Special rule for the target install
-install: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
-.PHONY : install
-
-# Special rule for the target install
-install/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
-.PHONY : install/fast
-
-# Special rule for the target install/local
-install/local: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local
-
-# Special rule for the target install/local
-install/local/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local/fast
-
-# Special rule for the target install/strip
-install/strip: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip
-
-# Special rule for the target install/strip
-install/strip/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip/fast
-
 # The main all target
 all: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/aaron/ws/rr_pi4B_driver/build/CMakeFiles /home/aaron/ws/rr_pi4B_driver/build//CMakeFiles/progress.marks
@@ -187,18 +142,29 @@ tst_motor_ctl_pigpiod/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_ctl_pigpiod.dir/build.make CMakeFiles/tst_motor_ctl_pigpiod.dir/build
 .PHONY : tst_motor_ctl_pigpiod/fast
 
-#=============================================================================
-# Target rules for targets named tst_motor_enc
+src/motor.o: src/motor.cpp.o
+.PHONY : src/motor.o
 
-# Build rule for target.
-tst_motor_enc: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tst_motor_enc
-.PHONY : tst_motor_enc
+# target to build an object file
+src/motor.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_ctl_pigpiod.dir/build.make CMakeFiles/tst_motor_ctl_pigpiod.dir/src/motor.cpp.o
+.PHONY : src/motor.cpp.o
 
-# fast build rule for target.
-tst_motor_enc/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_enc.dir/build.make CMakeFiles/tst_motor_enc.dir/build
-.PHONY : tst_motor_enc/fast
+src/motor.i: src/motor.cpp.i
+.PHONY : src/motor.i
+
+# target to preprocess a source file
+src/motor.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_ctl_pigpiod.dir/build.make CMakeFiles/tst_motor_ctl_pigpiod.dir/src/motor.cpp.i
+.PHONY : src/motor.cpp.i
+
+src/motor.s: src/motor.cpp.s
+.PHONY : src/motor.s
+
+# target to generate assembly for a file
+src/motor.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_ctl_pigpiod.dir/build.make CMakeFiles/tst_motor_ctl_pigpiod.dir/src/motor.cpp.s
+.PHONY : src/motor.cpp.s
 
 src/tst_motor_cntl.o: src/tst_motor_cntl.cpp.o
 .PHONY : src/tst_motor_cntl.o
@@ -248,30 +214,6 @@ src/tst_motor_ctl_pigpiod.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_ctl_pigpiod.dir/build.make CMakeFiles/tst_motor_ctl_pigpiod.dir/src/tst_motor_ctl_pigpiod.cpp.s
 .PHONY : src/tst_motor_ctl_pigpiod.cpp.s
 
-src/tst_motor_enc.o: src/tst_motor_enc.cpp.o
-.PHONY : src/tst_motor_enc.o
-
-# target to build an object file
-src/tst_motor_enc.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_enc.dir/build.make CMakeFiles/tst_motor_enc.dir/src/tst_motor_enc.cpp.o
-.PHONY : src/tst_motor_enc.cpp.o
-
-src/tst_motor_enc.i: src/tst_motor_enc.cpp.i
-.PHONY : src/tst_motor_enc.i
-
-# target to preprocess a source file
-src/tst_motor_enc.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_enc.dir/build.make CMakeFiles/tst_motor_enc.dir/src/tst_motor_enc.cpp.i
-.PHONY : src/tst_motor_enc.cpp.i
-
-src/tst_motor_enc.s: src/tst_motor_enc.cpp.s
-.PHONY : src/tst_motor_enc.s
-
-# target to generate assembly for a file
-src/tst_motor_enc.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_enc.dir/build.make CMakeFiles/tst_motor_enc.dir/src/tst_motor_enc.cpp.s
-.PHONY : src/tst_motor_enc.cpp.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -279,23 +221,18 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
-	@echo "... install"
-	@echo "... install/local"
-	@echo "... install/strip"
-	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... tst_motor_cntl"
 	@echo "... tst_motor_ctl_pigpiod"
-	@echo "... tst_motor_enc"
+	@echo "... src/motor.o"
+	@echo "... src/motor.i"
+	@echo "... src/motor.s"
 	@echo "... src/tst_motor_cntl.o"
 	@echo "... src/tst_motor_cntl.i"
 	@echo "... src/tst_motor_cntl.s"
 	@echo "... src/tst_motor_ctl_pigpiod.o"
 	@echo "... src/tst_motor_ctl_pigpiod.i"
 	@echo "... src/tst_motor_ctl_pigpiod.s"
-	@echo "... src/tst_motor_enc.o"
-	@echo "... src/tst_motor_enc.i"
-	@echo "... src/tst_motor_enc.s"
 .PHONY : help
 
 
