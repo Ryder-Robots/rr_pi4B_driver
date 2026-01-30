@@ -22,7 +22,7 @@
 
 #include <cstddef>
 #include <iostream>
-#include <pigpiod_if2.h> 
+#include <pigpio.h> 
 #include <thread>
 
 #define OK 0
@@ -114,21 +114,19 @@ class Motor {
 
         {
             int r = OK;
-            if ((r = gpio_write(pi_, dir_pin_, LOW)) != OK) {
+            if ((r = gpioWrite(dir_pin_, LOW)) != OK) {
                 switch(r) {
                     case PI_BAD_GPIO:
                         std::cout << "ERROR: pin " << dir_pin_ << " returned PI_BAD_GPIO\n";
-                        [[fallthrough]];
+                        break;
                     case PI_BAD_LEVEL:
                         std::cout << "ERROR: pin " << dir_pin_ << " returned PI_BAD_LEVEL\n";
-                        [[fallthrough]];
+                        break;
                     case PI_NOT_PERMITTED:
-                        std::cout << "ERROR: pin " << dir_pin_ << " returned PI_NOT_PERMITTED\n";
-                        [[fallthrough]];
-                    default:
-                        std::cout << "ERROR: pin " << dir_pin_ << "had errors!!!\n";
-                        return CallbackReturn::FAILURE; 
+                        std::cout << "ERROR: pin " << dir_pin_ << " returned PI_NOT_PERMITTED\n"; 
                 }
+                std::cout << "ERROR: pin " << dir_pin_ << "had errors!!!\n";
+                return CallbackReturn::FAILURE;
             }
         }
         if (set_pwm(0, 0) != OK) return CallbackReturn::FAILURE;
@@ -139,14 +137,14 @@ class Motor {
         CallbackReturn exit_res = CallbackReturn::SUCCESS;
         
         // dont exit early, attempt to set DIR_PIN to low, event if PWM fails.
-        // bud do motor first, its better for hardware that we shutdown motors before direction.
+        // but do motor first, its better for hardware that we shutdown motors before direction.
         if (set_pwm(0, 0) != OK) { 
             exit_res = CallbackReturn::FAILURE;
         }
 
         {
             int r = OK;
-            if ((r = gpio_write(pi_, dir_pin_, LOW)) != OK) {
+            if ((r = gpioWrite(dir_pin_, LOW)) != OK) {
                 // note fallthrough is delibrate here
                 switch(r) {
                     case PI_BAD_GPIO:
@@ -172,7 +170,7 @@ class Motor {
     
     CallbackReturn set_direction(DIRECTION dir) {
         int r = OK;
-        if ((r = gpio_write(pi_, dir_pin_, dir)) != OK) {
+        if ((r = gpioWrite(dir_pin_, dir)) != OK) {
             switch(r) {
                 case PI_BAD_GPIO:
                     std::cout << "ERROR: pin " << dir_pin_ << "returned PI_BAD_GPIO\n";
@@ -207,7 +205,7 @@ class Motor {
     const int DUTY_OFFSET = 10000;
 
     int set_pwm(int freq, int duty) {
-        int r = hardware_PWM(pi_, pwm_pin_, freq, duty*DUTY_OFFSET);
+        int r =  gpioHardwarePWM (pwm_pin_, freq, duty*DUTY_OFFSET);
         switch(r) {
             // note fallthrough is delibrate here
             case OK:
@@ -234,7 +232,7 @@ class Motor {
     }
 
     int set_mode_internal(uint pin, uint mode) {
-        switch (int r = set_mode(pi_, pin, mode)) {
+        switch (int r = gpioSetMode(pin, mode)) {
             case OK:
                 return r;
             case PI_BAD_GPIO:
@@ -255,7 +253,7 @@ class Motor {
 
 int main() {
 
-    int pi = pigpio_start(NULL, NULL);
+    int pi = gpioInitialise();
     if (pi < 0) {
         std::cout << "Failed to connect to pigpiod\n";
         return 1;
@@ -263,27 +261,29 @@ int main() {
 
     Motor motor_a;
     if (motor_a.on_configure(PWM_A, DIR_A, pi) == CallbackReturn::FAILURE) {
-        pigpio_stop(pi);
+        gpioTerminate();
         std::cout << "FAILED TO CONFIGURE!!! exiting program\n";
         return 1;
     }
 
     if (motor_a.on_activate() == CallbackReturn::FAILURE) {
-        pigpio_stop(pi); 
+        gpioTerminate(); 
         std::cout << "FAILED TO ACTIVATE!!! exiting program\n";
         return 1;
     }
 
     motor_a.set_direction(FORWARD);
     // should set motor to 50%
+    std::this_thread::sleep_for(std::chrono::microseconds(10)); 
     if (motor_a.set_pwm(65) == OK) {  
         // sleep for 3 seconds to test motor
         std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     }
 
+
     motor_a.on_shutdown();
 
     // motor_ctl.on_shutdown();
-    pigpio_stop(pi); 
+    gpioTerminate(); 
     return 0;
 }

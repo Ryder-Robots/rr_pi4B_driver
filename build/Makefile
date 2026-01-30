@@ -175,6 +175,19 @@ tst_motor_cntl/fast:
 .PHONY : tst_motor_cntl/fast
 
 #=============================================================================
+# Target rules for targets named tst_motor_ctl_pigpiod
+
+# Build rule for target.
+tst_motor_ctl_pigpiod: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tst_motor_ctl_pigpiod
+.PHONY : tst_motor_ctl_pigpiod
+
+# fast build rule for target.
+tst_motor_ctl_pigpiod/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_ctl_pigpiod.dir/build.make CMakeFiles/tst_motor_ctl_pigpiod.dir/build
+.PHONY : tst_motor_ctl_pigpiod/fast
+
+#=============================================================================
 # Target rules for targets named tst_motor_enc
 
 # Build rule for target.
@@ -210,6 +223,30 @@ src/tst_motor_cntl.s: src/tst_motor_cntl.cpp.s
 src/tst_motor_cntl.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_cntl.dir/build.make CMakeFiles/tst_motor_cntl.dir/src/tst_motor_cntl.cpp.s
 .PHONY : src/tst_motor_cntl.cpp.s
+
+src/tst_motor_ctl_pigpiod.o: src/tst_motor_ctl_pigpiod.cpp.o
+.PHONY : src/tst_motor_ctl_pigpiod.o
+
+# target to build an object file
+src/tst_motor_ctl_pigpiod.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_ctl_pigpiod.dir/build.make CMakeFiles/tst_motor_ctl_pigpiod.dir/src/tst_motor_ctl_pigpiod.cpp.o
+.PHONY : src/tst_motor_ctl_pigpiod.cpp.o
+
+src/tst_motor_ctl_pigpiod.i: src/tst_motor_ctl_pigpiod.cpp.i
+.PHONY : src/tst_motor_ctl_pigpiod.i
+
+# target to preprocess a source file
+src/tst_motor_ctl_pigpiod.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_ctl_pigpiod.dir/build.make CMakeFiles/tst_motor_ctl_pigpiod.dir/src/tst_motor_ctl_pigpiod.cpp.i
+.PHONY : src/tst_motor_ctl_pigpiod.cpp.i
+
+src/tst_motor_ctl_pigpiod.s: src/tst_motor_ctl_pigpiod.cpp.s
+.PHONY : src/tst_motor_ctl_pigpiod.s
+
+# target to generate assembly for a file
+src/tst_motor_ctl_pigpiod.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_ctl_pigpiod.dir/build.make CMakeFiles/tst_motor_ctl_pigpiod.dir/src/tst_motor_ctl_pigpiod.cpp.s
+.PHONY : src/tst_motor_ctl_pigpiod.cpp.s
 
 src/tst_motor_enc.o: src/tst_motor_enc.cpp.o
 .PHONY : src/tst_motor_enc.o
@@ -248,10 +285,14 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... tst_motor_cntl"
+	@echo "... tst_motor_ctl_pigpiod"
 	@echo "... tst_motor_enc"
 	@echo "... src/tst_motor_cntl.o"
 	@echo "... src/tst_motor_cntl.i"
 	@echo "... src/tst_motor_cntl.s"
+	@echo "... src/tst_motor_ctl_pigpiod.o"
+	@echo "... src/tst_motor_ctl_pigpiod.i"
+	@echo "... src/tst_motor_ctl_pigpiod.s"
 	@echo "... src/tst_motor_enc.o"
 	@echo "... src/tst_motor_enc.i"
 	@echo "... src/tst_motor_enc.s"

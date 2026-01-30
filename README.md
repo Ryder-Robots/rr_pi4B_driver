@@ -17,6 +17,12 @@ sudo apt install python-setuptools python3-setuptools
 
 ## Inital Testing
 
+### tst_motor_cntl vs tst_motor_ctl_pigiod
+
+It was found that using daemon produced PI_NOT_PERMITTED, this was not tested as sudo, since it should 
+be running through daemon. Further investigation will be conducted to see if this is a software bug
+within client.
+
 ### x_pigpio
 
 ```bash

@@ -71,11 +71,22 @@ add_executable(tst_motor_cntl
     src/tst_motor_cntl.cpp
 )
 
+add_executable(tst_motor_ctl_pigpiod
+    src/tst_motor_ctl_pigpiod.cpp
+)
+target_link_libraries(tst_motor_ctl_pigpiod
+  ${pigpio_LIBRARIES}
+  pthread
+  rt
+)
+target_compile_options(tst_motor_ctl_pigpiod PRIVATE -Wimplicit-fallthrough)
+
 target_link_libraries(tst_motor_cntl
   ${pigpio_LIBRARIES}
   pthread
   rt
 )
+target_compile_options(tst_motor_cntl PRIVATE -Wimplicit-fallthrough)
 
 ################################################################################
 # Build tst_motor_enc executable
