@@ -12,16 +12,22 @@
 #include "motor.hpp"
 // #include "motor_encoder.hpp"
 
-
+// motor controller pins
 #define PWM_A 18
 #define PWM_B 19
 #define DIR_A 23
 #define DIR_B 24
 
+// direction needs to be confirmed.
+// encoder pins
+#define EN_P1_A 4
+#define EN_P2_A 5
+
+#define EN_P1_B 8
+#define EN_P2_B 9
+
 // pulses per revolution (this is based upon FIT0450)
-#define PPR 16 
-
-
+#define PPR 16
 
 void test_motor(Motor &motor) {
     motor.set_direction(FORWARD);
@@ -34,7 +40,6 @@ void test_motor(Motor &motor) {
     }
     motor.on_deactivate();
 }
-
 
 int main() {
 
