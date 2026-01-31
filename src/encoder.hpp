@@ -12,6 +12,47 @@
 #include <functional>
 #include <cstdint>
 
+/**
+ * Encoder event status codes
+ */
+enum class TickStatus : uint8_t {
+    HEALTHY = 0,          // Valid rising edge detected
+    TIMEOUT = 1,          // No edge within configured timeout period
+    NOISE_REJECTED = 2,   // Edge rejected (interval too short, likely electrical noise)
+    UNEXPECTED = 3,       // Condition occurred that was unexpected, this should be treated immeidate termination.
+};
+
+
+
+/**
+ * Callback invoked by MotorEncoder on each hardware event (pulse or timeout).
+ * 
+ * Executed in interrupt context - keep processing minimal and avoid blocking operations.
+ * 
+ * @param gpio_pin  GPIO pin that sample is taken from.
+ * @param delta_us Time elapsed since the last valid pulse in microseconds.
+ *                 For OK status: time between valid pulses (use for velocity calculation)
+ *                 For TIMEOUT status: time since last valid pulse to timeout
+ *                 For NOISE_REJECTED status: the rejected (too-short) interval
+ * 
+ * @param tick   Current tick.
+ * 
+ * @param tick_status Event status indicating the nature of this callback:
+ *                    - TickStatus::HEALTHY: Valid rising edge detected on encoder phase
+ *                    - TickStatus::TIMEOUT: No pulse received within configured timeout period
+ *                    - TickStatus::NOISE_REJECTED: Pulse rejected (interval shorter than physical limits)
+ * 
+ * Note: The encoder reports all events neutrally. Application logic must interpret
+ * whether a timeout represents a fault condition based on expected motion state.
+ */
+using EncoderTickCallback = std::function<void(
+    int gpio_pin,
+    uint32_t delta_us,
+    uint32_t tick,
+    TickStatus tick_status
+)>;
+
+
 class MotorEncoder {
     public:
 
@@ -45,9 +86,8 @@ class MotorEncoder {
 
       // last tick, this should be set during configuration for initial tick.
       uint32_t last_tick_{0};
-      int pin_{0};
+      int pin_{-1};
       int timeout_{0};
       EncoderTickCallback tick_cb_{nullptr};
       uint32_t min_interval_us_{0};
-      void isr_wrapper();
 };
