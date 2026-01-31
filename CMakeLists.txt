@@ -98,6 +98,7 @@ target_compile_options(tst_motor_cntl PRIVATE -Wimplicit-fallthrough)
 add_executable(tst_motor_enc
   src/tst_motor_enc.cpp
   src/motor.cpp
+  src/encoder.cpp
 )
 target_compile_options(tst_motor_enc PRIVATE -Wimplicit-fallthrough)
 

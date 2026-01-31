@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/tst_motor_enc.dir/src/encoder.cpp.o"
+  "CMakeFiles/tst_motor_enc.dir/src/encoder.cpp.o.d"
   "CMakeFiles/tst_motor_enc.dir/src/motor.cpp.o"
   "CMakeFiles/tst_motor_enc.dir/src/motor.cpp.o.d"
   "CMakeFiles/tst_motor_enc.dir/src/tst_motor_enc.cpp.o"

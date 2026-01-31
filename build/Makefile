@@ -155,6 +155,30 @@ tst_motor_enc/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_enc.dir/build.make CMakeFiles/tst_motor_enc.dir/build
 .PHONY : tst_motor_enc/fast
 
+src/encoder.o: src/encoder.cpp.o
+.PHONY : src/encoder.o
+
+# target to build an object file
+src/encoder.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_enc.dir/build.make CMakeFiles/tst_motor_enc.dir/src/encoder.cpp.o
+.PHONY : src/encoder.cpp.o
+
+src/encoder.i: src/encoder.cpp.i
+.PHONY : src/encoder.i
+
+# target to preprocess a source file
+src/encoder.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_enc.dir/build.make CMakeFiles/tst_motor_enc.dir/src/encoder.cpp.i
+.PHONY : src/encoder.cpp.i
+
+src/encoder.s: src/encoder.cpp.s
+.PHONY : src/encoder.s
+
+# target to generate assembly for a file
+src/encoder.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_enc.dir/build.make CMakeFiles/tst_motor_enc.dir/src/encoder.cpp.s
+.PHONY : src/encoder.cpp.s
+
 src/motor.o: src/motor.cpp.o
 .PHONY : src/motor.o
 
@@ -265,6 +289,9 @@ help:
 	@echo "... tst_motor_cntl"
 	@echo "... tst_motor_ctl_pigpiod"
 	@echo "... tst_motor_enc"
+	@echo "... src/encoder.o"
+	@echo "... src/encoder.i"
+	@echo "... src/encoder.s"
 	@echo "... src/motor.o"
 	@echo "... src/motor.i"
 	@echo "... src/motor.s"
