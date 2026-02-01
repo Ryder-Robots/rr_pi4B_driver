@@ -63,7 +63,6 @@ CMAKE_BINARY_DIR = /home/aaron/ws/rr_pi4B_driver/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/tst_motor_cntl.dir/all
 all: CMakeFiles/tst_motor_ctl_pigpiod.dir/all
 all: CMakeFiles/tst_motor_enc.dir/all
 .PHONY : all
@@ -73,36 +72,9 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/tst_motor_cntl.dir/clean
 clean: CMakeFiles/tst_motor_ctl_pigpiod.dir/clean
 clean: CMakeFiles/tst_motor_enc.dir/clean
 .PHONY : clean
-
-#=============================================================================
-# Target rules for target CMakeFiles/tst_motor_cntl.dir
-
-# All Build rule for target.
-CMakeFiles/tst_motor_cntl.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_cntl.dir/build.make CMakeFiles/tst_motor_cntl.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_cntl.dir/build.make CMakeFiles/tst_motor_cntl.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/aaron/ws/rr_pi4B_driver/build/CMakeFiles --progress-num=1,2 "Built target tst_motor_cntl"
-.PHONY : CMakeFiles/tst_motor_cntl.dir/all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/tst_motor_cntl.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/aaron/ws/rr_pi4B_driver/build/CMakeFiles 2
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/tst_motor_cntl.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/aaron/ws/rr_pi4B_driver/build/CMakeFiles 0
-.PHONY : CMakeFiles/tst_motor_cntl.dir/rule
-
-# Convenience name for target.
-tst_motor_cntl: CMakeFiles/tst_motor_cntl.dir/rule
-.PHONY : tst_motor_cntl
-
-# clean rule for target.
-CMakeFiles/tst_motor_cntl.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_cntl.dir/build.make CMakeFiles/tst_motor_cntl.dir/clean
-.PHONY : CMakeFiles/tst_motor_cntl.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/tst_motor_ctl_pigpiod.dir
@@ -111,7 +83,7 @@ CMakeFiles/tst_motor_cntl.dir/clean:
 CMakeFiles/tst_motor_ctl_pigpiod.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_ctl_pigpiod.dir/build.make CMakeFiles/tst_motor_ctl_pigpiod.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_ctl_pigpiod.dir/build.make CMakeFiles/tst_motor_ctl_pigpiod.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/aaron/ws/rr_pi4B_driver/build/CMakeFiles --progress-num=3,4,5 "Built target tst_motor_ctl_pigpiod"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/aaron/ws/rr_pi4B_driver/build/CMakeFiles --progress-num=1,2,3 "Built target tst_motor_ctl_pigpiod"
 .PHONY : CMakeFiles/tst_motor_ctl_pigpiod.dir/all
 
 # Build rule for subdir invocation for target.
@@ -137,7 +109,7 @@ CMakeFiles/tst_motor_ctl_pigpiod.dir/clean:
 CMakeFiles/tst_motor_enc.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_enc.dir/build.make CMakeFiles/tst_motor_enc.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_enc.dir/build.make CMakeFiles/tst_motor_enc.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/aaron/ws/rr_pi4B_driver/build/CMakeFiles --progress-num=6,7,8,9 "Built target tst_motor_enc"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/aaron/ws/rr_pi4B_driver/build/CMakeFiles --progress-num=4,5,6,7 "Built target tst_motor_enc"
 .PHONY : CMakeFiles/tst_motor_enc.dir/all
 
 # Build rule for subdir invocation for target.

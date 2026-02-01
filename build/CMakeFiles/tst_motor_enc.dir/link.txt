@@ -1,1 +1,1 @@
-/usr/bin/c++ -g CMakeFiles/tst_motor_enc.dir/src/tst_motor_enc.cpp.o CMakeFiles/tst_motor_enc.dir/src/motor.cpp.o CMakeFiles/tst_motor_enc.dir/src/encoder.cpp.o -o tst_motor_enc  -Wl,-rpath,/usr/local/lib /usr/local/lib/libpigpio.so /usr/local/lib/libpigpiod_if.so /usr/local/lib/libpigpiod_if2.so -lpthread -lrt 
+/usr/bin/c++ -g CMakeFiles/tst_motor_enc.dir/src/tst_motor_enc.cpp.o CMakeFiles/tst_motor_enc.dir/src/motor.cpp.o CMakeFiles/tst_motor_enc.dir/src/encoder.cpp.o -o tst_motor_enc  -Wl,-rpath,/usr/local/lib /usr/local/lib/libpigpio.so -lpthread -lrt 

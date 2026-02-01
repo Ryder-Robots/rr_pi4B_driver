@@ -125,8 +125,6 @@ tst_motor_enc: CMakeFiles/tst_motor_enc.dir/src/motor.cpp.o
 tst_motor_enc: CMakeFiles/tst_motor_enc.dir/src/encoder.cpp.o
 tst_motor_enc: CMakeFiles/tst_motor_enc.dir/build.make
 tst_motor_enc: /usr/local/lib/libpigpio.so
-tst_motor_enc: /usr/local/lib/libpigpiod_if.so
-tst_motor_enc: /usr/local/lib/libpigpiod_if2.so
 tst_motor_enc: CMakeFiles/tst_motor_enc.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/aaron/ws/rr_pi4B_driver/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable tst_motor_enc"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/tst_motor_enc.dir/link.txt --verbose=$(VERBOSE)

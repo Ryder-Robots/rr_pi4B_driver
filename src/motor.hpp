@@ -8,6 +8,11 @@
 #include "tst_common.hpp"
 
 
+enum DIRECTION {
+    BACKWARD = 0,
+    FORWARD = 1,
+};
+
 /**
  * In final versions this should be done as an interface that can be used by concrete classes (may be plugins).
  *

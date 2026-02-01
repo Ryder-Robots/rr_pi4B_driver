@@ -1,4 +1,3 @@
-/home/aaron/ws/rr_pi4B_driver/build/CMakeFiles/tst_motor_cntl.dir
 /home/aaron/ws/rr_pi4B_driver/build/CMakeFiles/tst_motor_ctl_pigpiod.dir
 /home/aaron/ws/rr_pi4B_driver/build/CMakeFiles/tst_motor_enc.dir
 /home/aaron/ws/rr_pi4B_driver/build/CMakeFiles/edit_cache.dir

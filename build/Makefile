@@ -117,19 +117,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named tst_motor_cntl
-
-# Build rule for target.
-tst_motor_cntl: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tst_motor_cntl
-.PHONY : tst_motor_cntl
-
-# fast build rule for target.
-tst_motor_cntl/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_cntl.dir/build.make CMakeFiles/tst_motor_cntl.dir/build
-.PHONY : tst_motor_cntl/fast
-
-#=============================================================================
 # Target rules for targets named tst_motor_ctl_pigpiod
 
 # Build rule for target.
@@ -206,30 +193,6 @@ src/motor.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_enc.dir/build.make CMakeFiles/tst_motor_enc.dir/src/motor.cpp.s
 .PHONY : src/motor.cpp.s
 
-src/tst_motor_cntl.o: src/tst_motor_cntl.cpp.o
-.PHONY : src/tst_motor_cntl.o
-
-# target to build an object file
-src/tst_motor_cntl.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_cntl.dir/build.make CMakeFiles/tst_motor_cntl.dir/src/tst_motor_cntl.cpp.o
-.PHONY : src/tst_motor_cntl.cpp.o
-
-src/tst_motor_cntl.i: src/tst_motor_cntl.cpp.i
-.PHONY : src/tst_motor_cntl.i
-
-# target to preprocess a source file
-src/tst_motor_cntl.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_cntl.dir/build.make CMakeFiles/tst_motor_cntl.dir/src/tst_motor_cntl.cpp.i
-.PHONY : src/tst_motor_cntl.cpp.i
-
-src/tst_motor_cntl.s: src/tst_motor_cntl.cpp.s
-.PHONY : src/tst_motor_cntl.s
-
-# target to generate assembly for a file
-src/tst_motor_cntl.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/tst_motor_cntl.dir/build.make CMakeFiles/tst_motor_cntl.dir/src/tst_motor_cntl.cpp.s
-.PHONY : src/tst_motor_cntl.cpp.s
-
 src/tst_motor_ctl_pigpiod.o: src/tst_motor_ctl_pigpiod.cpp.o
 .PHONY : src/tst_motor_ctl_pigpiod.o
 
@@ -286,7 +249,6 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... tst_motor_cntl"
 	@echo "... tst_motor_ctl_pigpiod"
 	@echo "... tst_motor_enc"
 	@echo "... src/encoder.o"
@@ -295,9 +257,6 @@ help:
 	@echo "... src/motor.o"
 	@echo "... src/motor.i"
 	@echo "... src/motor.s"
-	@echo "... src/tst_motor_cntl.o"
-	@echo "... src/tst_motor_cntl.i"
-	@echo "... src/tst_motor_cntl.s"
 	@echo "... src/tst_motor_ctl_pigpiod.o"
 	@echo "... src/tst_motor_ctl_pigpiod.i"
 	@echo "... src/tst_motor_ctl_pigpiod.s"

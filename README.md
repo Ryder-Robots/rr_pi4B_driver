@@ -15,6 +15,23 @@ sudo make install
 sudo apt install python-setuptools python3-setuptools
 ```
 
+note that testing can be done using the following
+
+```bash
+sudo cat /etc/sudoers.d/gdb-nopasswd
+aaron ALL=(ALL) NOPASSWD: /usr/bin/gdb, /home/aaron/ws/rr_pi4B_driver/build/tst_motor_enc
+
+# to modify
+
+do visudo -f /etc/sudoers.d/gdb-nopasswd
+```
+
+DEBUGGING
+```bash
+sudo gdbserver :2345 build/tst_motor_enc
+
+```
+
 ## Inital Testing
 
 ### tst_motor_cntl vs tst_motor_ctl_pigiod

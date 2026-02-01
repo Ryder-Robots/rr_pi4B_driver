@@ -20,12 +20,7 @@
 #define HIGH 1
 #endif
 
-enum CallbackReturn {
-    SUCCESS,
-    FAILURE,
-};
-
-enum DIRECTION {
-    BACKWARD = 0,
-    FORWARD = 1,
+enum CallbackReturn : int {
+    SUCCESS = 0,
+    FAILURE = 1,
 };

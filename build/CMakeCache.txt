@@ -384,7 +384,7 @@ CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //Details about finding pigpio
-FIND_PACKAGE_MESSAGE_DETAILS_pigpio:INTERNAL=[/usr/local/include][/usr/local/lib/libpigpio.so][/usr/local/lib/libpigpiod_if.so][/usr/local/lib/libpigpiod_if2.so][v()]
+FIND_PACKAGE_MESSAGE_DETAILS_pigpio:INTERNAL=[/usr/local/include][/usr/local/lib/libpigpio.so][v()]
 //linker supports push/pop state
 _CMAKE_LINKER_PUSHPOP_STATE_SUPPORTED:INTERNAL=TRUE
 

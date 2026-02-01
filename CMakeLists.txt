@@ -35,16 +35,24 @@ find_library(pigpiod_if2_LIBRARY
 # Set the pigpio variables to plural form
 set(pigpio_INCLUDE_DIRS ${pigpio_INCLUDE_DIR})
 set(pigpio_INCLUDES     ${pigpio_INCLUDE_DIR})
-set(pigpio_LIBRARIES    ${pigpio_LIBRARY} ${pigpiod_if_LIBRARY} ${pigpiod_if2_LIBRARY})
+# Only include direct harware access.
+set(pigpio_LIBRARIES    ${pigpio_LIBRARY})
+#set(pigpio_LIBRARIES    ${pigpio_LIBRARY} ${pigpiod_if_LIBRARY} ${pigpiod_if2_LIBRARY})
 
 # Handle REQUIRED, QUIET, and version arguments 
 include(FindPackageHandleStandardArgs)
+
 find_package_handle_standard_args(pigpio 
   DEFAULT_MSG 
   pigpio_INCLUDE_DIR 
-  pigpio_LIBRARY 
-  pigpiod_if_LIBRARY 
-  pigpiod_if2_LIBRARY)
+  pigpio_LIBRARY)
+
+# find_package_handle_standard_args(pigpio 
+#   DEFAULT_MSG 
+#   pigpio_INCLUDE_DIR 
+#   pigpio_LIBRARY 
+#   pigpiod_if_LIBRARY 
+#   pigpiod_if2_LIBRARY)
 
 # Print pigpio status
 if(pigpio_FOUND)
@@ -68,9 +76,10 @@ include_directories(${pigpio_INCLUDE_DIRS})
 ################################################################################
 
 # Failed in testing.
-add_executable(tst_motor_cntl
-    src/tst_motor_cntl.cpp
-)
+# Ubuntu requires direct hardware access.
+# add_executable(tst_motor_cntl
+#     src/tst_motor_cntl.cpp
+# )
 
 # Current implementation but needs sudo'r access
 add_executable(tst_motor_ctl_pigpiod
@@ -84,12 +93,12 @@ target_link_libraries(tst_motor_ctl_pigpiod
 )
 target_compile_options(tst_motor_ctl_pigpiod PRIVATE -Wimplicit-fallthrough)
 
-target_link_libraries(tst_motor_cntl
-  ${pigpio_LIBRARIES}
-  pthread
-  rt
-)
-target_compile_options(tst_motor_cntl PRIVATE -Wimplicit-fallthrough)
+# target_link_libraries(tst_motor_cntl
+#   ${pigpio_LIBRARIES}
+#   pthread
+#   rt
+# )
+# target_compile_options(tst_motor_cntl PRIVATE -Wimplicit-fallthrough)
 
 ################################################################################
 # Build tst_motor_enc executable

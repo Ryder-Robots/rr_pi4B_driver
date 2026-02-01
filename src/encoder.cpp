@@ -32,21 +32,41 @@ CallbackReturn MotorEncoder::on_activate() {
     }
 
     // For production, this should use a switch which provides feedback.
-    if (gpioSetPullUpDown(pin_, PI_PUD_UP) != 0) {
+    if (gpioSetPullUpDown(pin_, PI_PUD_DOWN) != 0) {
         return CallbackReturn::FAILURE;
     }
 
     last_tick_ = gpioTick();
     // For production, this should use a switch which provides feedback.
-    if (gpioSetISRFuncEx(
+    // if (gpioSetISRFuncEx(
+    //         pin_,
+    //         RISING_EDGE,  
+    //         timeout_,            
+    //         &MotorEncoder::gpio_isr_func,
+    //         this
+    //     ) != 0) {
+    //         return CallbackReturn::FAILURE;
+    // }
+    switch (gpioSetISRFuncEx(
             pin_,
             RISING_EDGE,  
             timeout_,            
             &MotorEncoder::gpio_isr_func,
             this
-        ) != 0) {
+        )) {
+        case 0:
+            break;
+        case PI_BAD_GPIO:
+            return CallbackReturn::FAILURE;
+        case PI_BAD_EDGE:
+            return CallbackReturn::FAILURE;
+        case PI_BAD_ISR_INIT:
+            return CallbackReturn::FAILURE;
+        default:
             return CallbackReturn::FAILURE;
     }
+
+
     return CallbackReturn::SUCCESS;
 }
 
@@ -74,7 +94,6 @@ void MotorEncoder::handle_interrupt(int gpio, int level, uint32_t tick) {
         case 1:
             if (delta_us < min_interval_us_) {
                 status = TickStatus::NOISE_REJECTED;
-                break;
             }
             last_tick_ = tick;
             break;
