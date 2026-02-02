@@ -1,7 +1,6 @@
 # rr_pi4B_driver
 low level driver tests for Pi4B revision 1.5
 
-
 ## Installation
 
 Note that for this to work curerntly the delvelop branch of:
@@ -516,4 +515,9 @@ Test 2: Both motors forward, 85% speed
 Test 3: Motor A forward, Motor B reverse
 Test 4: Stop all motors
 ✅ All tests complete
+```
+
+## Results of Pulse testing
+
+```
 ```

@@ -36,7 +36,7 @@ class Motor {
     CallbackReturn on_configure(uint pwm_pin, uint dir_pin, int pi);
 
     // create links with hardware. Perform error checking, and fail if something goes wrong.
-    CallbackReturn on_activate() ;
+    CallbackReturn on_activate();
 
     CallbackReturn on_deactivate();
 

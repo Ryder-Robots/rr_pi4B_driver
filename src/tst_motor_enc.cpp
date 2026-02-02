@@ -84,7 +84,7 @@ int main()
     l_tick.clear();
     l_tick_status.clear();
 
-    if (motor_a.on_configure(PWM_A, DIR_A, pi) == CallbackReturn::FAILURE || en_a.on_configure(EN_P1_A, &cb, 0, 5) == CallbackReturn::FAILURE) {
+    if (motor_a.on_configure(PWM_A, DIR_A, pi) == CallbackReturn::FAILURE || en_a.on_configure(EN_P1_A, &cb, 0, 0) == CallbackReturn::FAILURE) {
         gpioTerminate();
         std::cout << "FAILED TO CONFIGURE!!! exiting program\n";
         return 1;
@@ -141,16 +141,16 @@ int main()
         return 1;
     }
 
-    std::cout << std::setw(12) << "GPIO"
-              << std::setw(12) << "DELTA_US"
-              << std::setw(12) << "TICK_US"
-              << std::setw(12) << "STATUS" << "\n";
+    std::cout << "GPIO,"
+              << "DELTA_US,"
+              << "TICK_US,"
+              << "STATUS" << "\n";
 
     for (size_t i = 0; i < s; i++) {
-        std::cout << std::setw(12) << l_gpio_pin.front()
-                  << std::setw(12) << l_delta_us.front()
-                  << std::setw(12) << l_tick.front()
-                  << std::setw(12) << (int)l_tick_status.front() << "\n";
+        std::cout << l_gpio_pin.front() << ","
+                  << l_delta_us.front() << ","
+                  <<  l_tick.front() << ","
+                  <<  (int)l_tick_status.front() << "\n";
 
         l_gpio_pin.pop_front();
         l_delta_us.pop_front();

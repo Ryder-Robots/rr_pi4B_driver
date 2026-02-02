@@ -37,16 +37,7 @@ CallbackReturn MotorEncoder::on_activate() {
     }
 
     last_tick_ = gpioTick();
-    // For production, this should use a switch which provides feedback.
-    // if (gpioSetISRFuncEx(
-    //         pin_,
-    //         RISING_EDGE,  
-    //         timeout_,            
-    //         &MotorEncoder::gpio_isr_func,
-    //         this
-    //     ) != 0) {
-    //         return CallbackReturn::FAILURE;
-    // }
+
     switch (gpioSetISRFuncEx(
             pin_,
             RISING_EDGE,  
@@ -71,7 +62,7 @@ CallbackReturn MotorEncoder::on_activate() {
 }
 
 CallbackReturn  MotorEncoder::on_deactivate() {
-    gpioSetISRFuncEx(pin_, RISING_EDGE, 0, nullptr, nullptr);
+    gpioSetISRFuncEx(pin_, expected_level_, 0, nullptr, nullptr);
     return CallbackReturn::SUCCESS;
 }
 
@@ -83,23 +74,22 @@ void MotorEncoder::gpio_isr_func(int gpio, int level, uint32_t tick, void *userd
 }
 
 void MotorEncoder::handle_interrupt(int gpio, int level, uint32_t tick) {
-    uint32_t delta_us = tick - last_tick_;
+    /*
+     0 = change to low (a falling edge)
+     1 = change to high (a rising edge)
+     2 = no level change (interrupt timeout)
+    */
+
     TickStatus status = TickStatus::HEALTHY;
-
-    switch (level) {
-        case 2:
+    if (level != expected_level_) {
+        status = TickStatus::NOISE_REJECTED;
+        if (level == 2) {
             status = TickStatus::TIMEOUT;
-            last_tick_ = tick;
-            break;
-        case 1:
-            if (delta_us < min_interval_us_) {
-                status = TickStatus::NOISE_REJECTED;
-            }
-            last_tick_ = tick;
-            break;
-        default:
+        } else {
             status = TickStatus::UNEXPECTED;
+        }
     }
-
+    int32_t delta_us = tick - last_tick_;
+    last_tick_ = tick;
     tick_cb_(gpio, delta_us, tick, status);
 }
