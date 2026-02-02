@@ -16,7 +16,7 @@ endif()
 
 # Find the path to the pigpio includes
 find_path(pigpio_INCLUDE_DIR 
-  NAMES pigpio.h pigpiod_if.h pigpiod_if2.h
+  NAMES pigpio.h
   HINTS /usr/local/include)
 
 # Find the pigpio libraries
@@ -24,20 +24,15 @@ find_library(pigpio_LIBRARY
   NAMES libpigpio.so pigpio
   HINTS /usr/local/lib)
 
-find_library(pigpiod_if_LIBRARY 
-  NAMES libpigpiod_if.so pigpiod_if
-  HINTS /usr/local/lib)
-
-find_library(pigpiod_if2_LIBRARY 
-  NAMES libpigpiod_if2.so pigpiod_if2
-  HINTS /usr/local/lib)
 
 # Set the pigpio variables to plural form
 set(pigpio_INCLUDE_DIRS ${pigpio_INCLUDE_DIR})
-set(pigpio_INCLUDES     ${pigpio_INCLUDE_DIR})
 # Only include direct harware access.
 set(pigpio_LIBRARIES    ${pigpio_LIBRARY})
-#set(pigpio_LIBRARIES    ${pigpio_LIBRARY} ${pigpiod_if_LIBRARY} ${pigpiod_if2_LIBRARY})
+
+# For local build
+set(pigpio_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/../pigpio") 
+set(pigpio_LIBRARIES "${CMAKE_SOURCE_DIR}/../pigpio/build/libpigpio.so")
 
 # Handle REQUIRED, QUIET, and version arguments 
 include(FindPackageHandleStandardArgs)
@@ -47,12 +42,6 @@ find_package_handle_standard_args(pigpio
   pigpio_INCLUDE_DIR 
   pigpio_LIBRARY)
 
-# find_package_handle_standard_args(pigpio 
-#   DEFAULT_MSG 
-#   pigpio_INCLUDE_DIR 
-#   pigpio_LIBRARY 
-#   pigpiod_if_LIBRARY 
-#   pigpiod_if2_LIBRARY)
 
 # Print pigpio status
 if(pigpio_FOUND)
