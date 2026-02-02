@@ -4,6 +4,10 @@ low level driver tests for Pi4B revision 1.5
 
 ## Installation
 
+Note that for this to work curerntly the delvelop branch of:
+
+https://github.com/Ryder-Robots/pigpio needs to be used.
+
 reference: http://abyz.me.uk/rpi/pigpio/download.html
 
 ```bash
