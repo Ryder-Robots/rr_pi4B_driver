@@ -85,8 +85,6 @@ void MotorEncoder::handle_interrupt(int gpio, int level, uint32_t tick) {
         status = TickStatus::NOISE_REJECTED;
         if (level == 2) {
             status = TickStatus::TIMEOUT;
-        } else {
-            status = TickStatus::UNEXPECTED;
         }
     }
     int32_t delta_us = tick - last_tick_;
