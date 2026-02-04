@@ -20,8 +20,8 @@
 #define KP 0.5
 #define KI 0
 #define KD 0
-#define PID_MIN 0 // aproiximate Nm per pulse (approx 5 kph)
-#define PID_MAX 85 // maximum of around 85% of power 
+#define PID_MIN 0  // aproiximate Nm per pulse (approx 5 kph)
+#define PID_MAX 85 // maximum of around 85% of power
 
 /*
 MotorEncoder* encoder_ptr = &encoder;
@@ -33,19 +33,18 @@ EncoderTickCallback callback = [encoder_ptr](int gpio_pin, uint32_t delta_us, ui
 class MotorController
 {
   public:
-
-   CallbackReturn on_configure(const int pwm_pin, 
-        const int dir_pin, 
-        const int en_pin, 
-        int timeout, 
-        uint32_t min_interval_us, 
+    CallbackReturn on_configure(const int pwm_pin,
+        const int dir_pin,
+        const int en_pin,
+        int timeout,
+        uint32_t min_interval_us,
         uint32_t pid_frequency_rate,
         double kp,
         double ki,
         double kd,
         double p_min,
-        double p_max
-    ) {
+        double p_max)
+    {
         last_pid_tick_ = std::chrono::steady_clock::now();
 
         if (pid_frequency_rate <= 0) {
@@ -53,16 +52,15 @@ class MotorController
             return CallbackReturn::FAILURE;
         }
         pid_frequency_rate_ = pid_frequency_rate;
-        
+
         callback_ = [this](int gpio_pin, uint32_t delta_us, uint32_t tick, TickStatus tick_status) {
             this->encoder_cb_(gpio_pin, delta_us, tick, tick_status);
         };
 
         // configure motor, pid and encoder.
-        if (motor_.on_configure(pwm_pin, dir_pin, 0) == CallbackReturn::FAILURE ||  
+        if (motor_.on_configure(pwm_pin, dir_pin, 0) == CallbackReturn::FAILURE ||
             encoder_.on_configure(en_pin, callback_, timeout, min_interval_us) == CallbackReturn::FAILURE ||
-            pid_.on_configure(kp, ki, kd, p_min, p_max) == CallbackReturn::FAILURE
-        ) {
+            pid_.on_configure(kp, ki, kd, p_min, p_max) == CallbackReturn::FAILURE) {
             callback_ = nullptr;
             return CallbackReturn::FAILURE;
         }
@@ -72,46 +70,35 @@ class MotorController
         // set motor to '0' (full stop)
         motor_.set_pwm(0);
         return CallbackReturn::SUCCESS;
-   }
+    }
 
 
-   // Perform activation
-   CallbackReturn on_activate() {
+    // Perform activation
+    CallbackReturn on_activate()
+    {
         last_pid_tick_ = std::chrono::steady_clock::now();
-        // setup thread for PID, note that motor is already in a thread using PIGPIO so no 
+        // setup thread for PID, note that motor is already in a thread using PIGPIO so no
         // need to create a thread for it.
+        running_ = true;
         control_thread_ = std::thread(&MotorController::pid_cb_, this);
-
-        // perform any further checks before setting it to running.
-        {
-            std::lock_guard<std::mutex> lock(cb_mutex_);
-            running_ = true;
-        }
-        
         return CallbackReturn::SUCCESS;
-   }
+    }
 
-   // Begin shutdown procedure
-   CallbackReturn on_deactivate() {
-        // the lock should block most things, but do not rely on it.
+    // Begin shutdown procedure
+    CallbackReturn on_deactivate()
+    {
+        running_ = false; // Atomic, no lock needed
+
+        if (control_thread_.joinable()) {
+            control_thread_.join();
+        }
+
+        // Now safe to clean up with lock if needed
         std::lock_guard<std::mutex> lock(cb_mutex_);
-
-        // set running to false first, this will stop PID of overriding motor
-        // PWM
-        running_ = false;
-
-        // turn motor off.
         motor_.set_pwm(0);
-
-        // remove callback.
         callback_ = nullptr;
-
-        while (!control_thread_.joinable()) {
-            // add a countdown for a hard shutdown here.
-        }
-        control_thread_.join();
         return CallbackReturn::SUCCESS;
-   }
+    }
 
     /*
      * Waits for a external command which may change direction or delta_us, for testing
@@ -125,14 +112,15 @@ class MotorController
         if (direction != direction_ || delta_us == 0) {
             pid_.reset();
             direction_ = direction;
+            motor_.set_direction(direction_);
         }
-
         // this will affectively change the veloicty.
         target_nm_ = delta_us;
     }
 
     // This will publish feedback to the e_control_unit node.
-    void publish() {
+    void publish()
+    {
         // this is minimal, the e_control_unit node will provide feedback that upstream
         // such as ros2_control can use. Just give the ECU enough to make decisions for multiple
         // motors.
@@ -150,17 +138,17 @@ class MotorController
 
     // flow control variables
     std::thread control_thread_;
-    std::atomic<bool> running_{false};
+    std::atomic<bool> running_ {false};
     uint32_t pid_frequency_rate_ = 0; // rate in milliseconds that PID will be executed.
 
     // delta_us_accum has last delta_us added to it, for each call of encoder_cb_, this helps
     // create the mean of deltas_us_ since last PID call.
     double delta_us_accum_ = 0;
     uint32_t delta_us_count_ = 0;
-    std::chrono::steady_clock::time_point last_pid_tick_; 
+    std::chrono::steady_clock::time_point last_pid_tick_;
     std::mutex cb_mutex_;
 
-    EncoderTickCallback callback_{nullptr};
+    EncoderTickCallback callback_ {nullptr};
 
     // Current command variables
     MotorEncoder encoder_;
@@ -182,12 +170,12 @@ class MotorController
         // to deal with it, in worse case this could mean stopping.
         //
         // Note that each encoder has two pins, therefore we can use one
-        // as redundancy and accept that directon is probally known. So under 
-        // error conditions it is possilble to reset the en pin to the redundant 
+        // as redundancy and accept that directon is probally known. So under
+        // error conditions it is possilble to reset the en pin to the redundant
         // one.
 
-        (void) gpio_pin;
-        (void) tick;
+        (void)gpio_pin;
+        (void)tick;
 
         if (tick_status == TickStatus::HEALTHY) {
             // keep it really light only get mutex if something is changing.
@@ -203,24 +191,30 @@ class MotorController
     void pid_cb_()
     {
         while (running_) {
-            std::lock_guard<std::mutex> lock(cb_mutex_);
-            uint32_t measurement = delta_us_accum_ / delta_us_count_;
+            uint32_t measurement = 0;
+            double target = 0;
+            {
+                std::lock_guard<std::mutex> lock(cb_mutex_);
+                measurement = (delta_us_count_ > 0) ? (delta_us_accum_ / delta_us_count_) : 0;
+                delta_us_accum_ = 0;
+                delta_us_count_ = 0;
+                target = target_nm_;
+            }
+
             auto now = std::chrono::steady_clock::now();
             double dt = std::chrono::duration<double>(now - last_pid_tick_).count();
             last_pid_tick_ = now;
 
-            int duty = pid_.compute(target_nm_, measurement, dt);
+            int duty = pid_.compute(target, measurement, dt);
             motor_.set_pwm(duty);
-            std::this_thread::sleep_for(std::chrono::milliseconds(pid_frequency_rate_)); 
+            std::this_thread::sleep_for(std::chrono::milliseconds(pid_frequency_rate_));
         }
     }
 };
 
 
-
 int main()
 {
-
     // start motor controller.
     MotorController cntl;
     if (cntl.on_configure(PWM_A, DIR_A, EN_P1_A, TIMEOUT, MIN_INTERVAL, PID_FREQUENCY, KP, KI, KD, PID_MIN, PID_MAX) == CallbackReturn::FAILURE) {
@@ -234,8 +228,11 @@ int main()
         return 1;
     }
 
-    for (auto i = 0;i < 3; i++) {
-        
+    // run for 3 seconds @60%
+    for (auto i = 0; i < 3; i++) {
+        cntl.subscribe(60, DIRECTION::FORWARD);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        cntl.publish();
     }
 
     cntl.on_deactivate();
