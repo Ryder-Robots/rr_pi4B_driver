@@ -82,17 +82,10 @@ target_link_libraries(tst_motor_ctl_pigpiod
 )
 target_compile_options(tst_motor_ctl_pigpiod PRIVATE -Wimplicit-fallthrough)
 
-# target_link_libraries(tst_motor_cntl
-#   ${pigpio_LIBRARIES}
-#   pthread
-#   rt
-# )
-# target_compile_options(tst_motor_cntl PRIVATE -Wimplicit-fallthrough)
 
 ################################################################################
 # Build tst_motor_enc executable
 ################################################################################
-# To be developed.
 add_executable(tst_motor_enc
   src/tst_motor_enc.cpp
   src/motor.cpp
@@ -101,6 +94,23 @@ add_executable(tst_motor_enc
 target_compile_options(tst_motor_enc PRIVATE -Wimplicit-fallthrough)
 
 target_link_libraries(tst_motor_enc
+  ${pigpio_LIBRARIES}
+  pthread
+  rt
+)
+
+################################################################################
+# Build tst_pid executable
+################################################################################
+add_executable(tst_pid
+  src/tst_pid.cpp
+  src/motor.cpp
+  src/encoder.cpp
+  src/pid.cpp
+)
+target_compile_options(tst_pid PRIVATE -Wimplicit-fallthrough)
+
+target_link_libraries(tst_pid
   ${pigpio_LIBRARIES}
   pthread
   rt

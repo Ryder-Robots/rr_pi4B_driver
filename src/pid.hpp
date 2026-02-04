@@ -24,7 +24,6 @@ class PID {
         double kp_, ki_, kd_;
         double output_min_, output_max_;
         double integral_;
-        double previous_error_;
         bool first_run_;
         double prev_error_ = 0.0;
 };

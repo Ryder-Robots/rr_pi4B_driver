@@ -52,6 +52,7 @@ static void cb(
     l_tick_status.push_back(tick_status);
 }
 
+
 int main()
 {
     // pre-initialization step
@@ -84,7 +85,7 @@ int main()
     l_tick.clear();
     l_tick_status.clear();
 
-    if (motor_a.on_configure(PWM_A, DIR_A, pi) == CallbackReturn::FAILURE || en_a.on_configure(EN_P1_A, &cb, 0, 0) == CallbackReturn::FAILURE) {
+    if (motor_a.on_configure(PWM_A, DIR_A, pi) == CallbackReturn::FAILURE || en_a.on_configure(EN_P1_A, &cb, 0, 20) == CallbackReturn::FAILURE) {
         gpioTerminate();
         std::cout << "FAILED TO CONFIGURE!!! exiting program\n";
         return 1;
@@ -98,19 +99,19 @@ int main()
     }
 
     std::cout << "Testing motor A\n";
-    motor_a.set_direction(FORWARD);
-    // motor_b.set_direction(FORWARD);
-    std::this_thread::sleep_for(std::chrono::microseconds(10));
-    if (motor_a.set_pwm(65) == OK) {
-        // sleep for 3 seconds to test motor
-        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-    }
-    else {
-        std::cout << "FAILED to set PWM for 65 percent of duty cycle\n";
-        // allow for reset
-        motor_a.set_pwm(0);
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    }
+    // motor_a.set_direction(FORWARD);
+    // // motor_b.set_direction(FORWARD);
+    // std::this_thread::sleep_for(std::chrono::microseconds(10));
+    // if (motor_a.set_pwm(65) == OK) {
+    //     // sleep for 3 seconds to test motor
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+    // }
+    // else {
+    //     std::cout << "FAILED to set PWM for 65 percent of duty cycle\n";
+    //     // allow for reset
+    //     motor_a.set_pwm(0);
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    // }
 
     // Increase speed motor A and B
     if (motor_a.set_pwm(85) == OK) {
