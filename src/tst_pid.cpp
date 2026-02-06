@@ -75,7 +75,10 @@ class GpIoManager
 class MotorController
 {
   public:
-    CallbackReturn on_configure(const int pwm_pin,
+
+    // TODO: Ignore PID variables kp, ki, kd, p_min, and p_max for now these will be re-introduced.
+    CallbackReturn on_configure(
+        const int pwm_pin,
         const int dir_pin,
         const int en_pin,
         int timeout,
@@ -97,6 +100,7 @@ class MotorController
               callback_ = nullptr;
               return CallbackReturn::FAILURE;
         }
+        pwm_pin_ = pwm_pin;
         return CallbackReturn::SUCCESS;
     }
 
@@ -121,9 +125,12 @@ class MotorController
         auto enc_result = encoder_.on_deactivate();  // stop interrupts first
         auto motor_result = motor_.on_deactivate();  // then stop PWM
         callback_ = nullptr;
-        delta_ct_ = 0;
-        delta_us_ct_ = 0;
-        delta_us_accum_ = 0;
+        std::this_thread::sleep_for(std::chrono::microseconds(100));
+
+        delta_ct_.store(0, std::memory_order_release);
+        delta_us_ct_.store(0, std::memory_order_release);
+        delta_us_accum_.store(0, std::memory_order_release);
+        publish(DIRECTION::FORWARD, 0);
 
         return (enc_result == CallbackReturn::SUCCESS && motor_result == CallbackReturn::SUCCESS)
             ? CallbackReturn::SUCCESS : CallbackReturn::FAILURE;
@@ -134,26 +141,18 @@ class MotorController
         motor_.set_pwm(duty_cycle);
     }
 
+    // velocity, duty_cycle, direction
     void subscribe() {
-        std::cout << "velocity: " << velocity_.load(std::memory_order_acquire) << "\n";
+        std::cout << velocity_.load(std::memory_order_acquire) << "," << gpioGetPWMdutycycle(pwm_pin_) << "\n";
     }
 
   protected:
     void encoder_cb_(
-        int gpio_pin,
-        uint32_t delta_us,
-        uint32_t tick,
-        TickStatus tick_status)
+        const int gpio_pin,
+        const uint32_t delta_us,
+        const uint32_t tick,
+        const TickStatus tick_status)
     {
-        // only worry about this condition during testing, under
-        // production conditions if not healthy the code will need
-        // to deal with it, in worse case this could mean stopping.
-        //
-        // Note that each encoder has two pins, therefore we can use one
-        // as redundancy and accept that directon is probally known. So under
-        // error conditions it is possilble to reset the en pin to the redundant
-        // one.
-
         (void)gpio_pin;
         (void)tick;
 
@@ -161,33 +160,53 @@ class MotorController
             return;
         }
         
-
-        delta_ct_++;
-        if (tick_status == TickStatus::HEALTHY && delta_us > MIN_DELTA_US && delta_us < MAX_DELTA_US) {
-            // keep it really light only get mutex if something is changing.
-            delta_us_ct_++;
-            delta_us_accum_ += delta_us;
+        // Increment pulse count (returns OLD value)
+        int old_delta_ct = delta_ct_.fetch_add(1, std::memory_order_acq_rel);
+        int new_delta_ct = old_delta_ct + 1;
+        
+        // Accumulate valid timing measurements
+        if (tick_status == TickStatus::HEALTHY && 
+            delta_us > MIN_DELTA_US && 
+            delta_us < MAX_DELTA_US) {
+            
+            delta_us_ct_.fetch_add(1, std::memory_order_acq_rel);
+            delta_us_accum_.fetch_add(static_cast<uint64_t>(delta_us), std::memory_order_acq_rel);
         }
 
-        if (delta_ct_ >= PPR_) {
-            delta_ct_ = 0;
-            if (delta_us_accum_ > 0 && delta_us_ct_ > 0) {
-                double avg_us = delta_us_accum_ / static_cast<double>(delta_us_ct_);
-                velocity_.store(1'000'000.0 / (avg_us * PPR_), std::memory_order_release);
+        // Check if we've completed a full rotation
+        if (new_delta_ct >= PPR_) {
+            int expected = new_delta_ct;
+
+            if (delta_ct_.compare_exchange_strong(expected, 0,
+                                          std::memory_order_acq_rel,
+                                          std::memory_order_acquire)) {
+                // Load accumulated values once
+                uint64_t accum = delta_us_accum_.load(std::memory_order_acquire);
+                int ct = delta_us_ct_.load(std::memory_order_acquire);
+                
+                // Reset counters for next rotation
+                delta_ct_.store(0, std::memory_order_release);
+                delta_us_ct_.store(0, std::memory_order_release);
+                delta_us_accum_.store(0, std::memory_order_release);
+                
+                // Calculate velocity if we have valid measurements
+                if (accum > 0 && ct > 0) {
+                    double avg_us = static_cast<double>(accum) / static_cast<double>(ct);
+                    velocity_.store(1'000'000.0 / (avg_us * PPR_), std::memory_order_release);
+                }
             }
-            delta_us_accum_ = 0;
-            delta_us_ct_ = 0;
         }
     }
 
   private:
     // output variables
     std::atomic<double> velocity_ {0}; // velocity per rotation.
-
+    
     // state variables
-    int delta_ct_ {0};     // count for each delta that has arrive (regardless of its in range or not)
-    int delta_us_ct_ {0};  // count of healthy delta ticks.
-    double delta_us_accum_ {0}; // accumulate deltas
+    std::atomic<int> delta_ct_ {0};  // count for each delta that has arrive (regardless of its in range or not)
+    std::atomic<int> delta_us_ct_{0};    // count of healthy delta ticks.
+    std::atomic<uint64_t> delta_us_accum_{0}; // accumulate deltas
+    int pwm_pin_ = -1;
 
     // Drivers
     MotorEncoder encoder_;
@@ -205,285 +224,41 @@ class MotorController
     const int    PPR_{8};
 };
 
-// class MotorController_1
-// {
-//   public:
-//     CallbackReturn on_configure(const int pwm_pin,
-//         const int dir_pin,
-//         const int en_pin,
-//         int timeout,
-//         uint32_t min_interval_us,
-//         uint32_t pid_frequency_rate,
-//         double kp,
-//         double ki,
-//         double kd,
-//         double p_min,
-//         double p_max)
-//     {
-//         last_pid_tick_ = std::chrono::steady_clock::now();
-
-//         if (pid_frequency_rate <= 0) {
-//             // invalid frequency
-//             return CallbackReturn::FAILURE;
-//         }
-//         pid_frequency_rate_ = pid_frequency_rate;
-
-//         callback_ = [this](int gpio_pin, uint32_t delta_us, uint32_t tick, TickStatus tick_status) {
-//             this->encoder_cb_(gpio_pin, delta_us, tick, tick_status);
-//         };
-
-//         // configure motor, pid and encoder.
-//         if (motor_.on_configure(pwm_pin, dir_pin, 0) == CallbackReturn::FAILURE ||
-//             encoder_.on_configure(en_pin, callback_, timeout, min_interval_us) == CallbackReturn::FAILURE ||
-//             pid_.on_configure(kp, ki, kd, p_min, p_max) == CallbackReturn::FAILURE) {
-//             callback_ = nullptr;
-//             return CallbackReturn::FAILURE;
-//         }
-//         // hang onto the PWM pin for publising info
-//         pwm_pin_ = pwm_pin;
-
-//         // set motor to '0' (full stop)
-//         motor_.set_pwm(0);
-//         return CallbackReturn::SUCCESS;
-//     }
-
-
-//     // Perform activation
-//     CallbackReturn on_activate()
-//     {
-//         last_pid_tick_ = std::chrono::steady_clock::now();
-
-//         // activate motor and encoder.
-//         if (motor_.on_activate() != CallbackReturn::SUCCESS) {
-//             return CallbackReturn::FAILURE;
-//         }
-//         if (encoder_.on_activate() != CallbackReturn::SUCCESS) {
-//             return CallbackReturn::FAILURE;
-//         }
-
-//         // setup thread for PID, note that motor is already in a thread using PIGPIO so no
-//         // need to create a thread for it.
-//         running_ = true;
-//         control_thread_ = std::thread(&MotorController::pid_cb_, this);
-//         return CallbackReturn::SUCCESS;
-//     }
-
-//     void start_motor()
-//     {
-//         motor_started_ = true;
-//     }
-
-//     void stop_motor()
-//     {
-//         motor_started_ = false;
-//         motor_.set_pwm(0);
-//     }
-
-//     // Begin shutdown procedure
-//     CallbackReturn on_deactivate()
-//     {
-//         running_ = false; // Atomic, no lock needed
-
-//         if (control_thread_.joinable()) {
-//             control_thread_.join();
-//         }
-
-//         // Now safe to clean up with lock if needed
-//         std::lock_guard<std::mutex> lock(cb_mutex_);
-//         motor_.set_pwm(0);
-//         callback_ = nullptr;
-
-//         CallbackReturn rt = CallbackReturn::SUCCESS;
-//         rt = motor_.on_deactivate();
-//         if (rt == CallbackReturn::SUCCESS) {
-//             return encoder_.on_deactivate();
-//         }
-//         encoder_.on_deactivate();
-//         return CallbackReturn::FAILURE;
-//     }
-
-//     /*
-//      * Waits for a external command which may change direction or delta_us, for testing
-//      * this is a command but in ROS2 it will be subscribed to a topic.
-//      * 
-//      * Values wil be recieved from the e_control_unit
-//      */
-//     void subscribe(double delta_us, DIRECTION direction)
-//     {
-//         std::lock_guard<std::mutex> lock(cb_mutex_);
-//         if (direction != direction_ || delta_us == 0) {
-//             pid_.reset();
-//             direction_ = direction;
-//             motor_.set_direction(direction_);
-//         }
-//         // this will affectively change the veloicty.
-//         target_nm_ = delta_us;
-//     }
-
-//     // This will publish feedback to the e_control_unit node.
-//     void publish()
-//     {
-//         // this is minimal, the e_control_unit node will provide feedback that upstream
-//         // such as ros2_control can use. Just give the ECU enough to make decisions for multiple
-//         // motors.
-//         int dc = gpioGetPWMdutycycle(pwm_pin_);
-//         std::cout << "duty cycle = " << dc << " direction = " << direction_ << "\n";
-//     }
-
-//   private:
-//     // feedback
-//     int pwm_pin_ = -1;
-
-//     // command variables
-//     double target_nm_ = 0;
-//     DIRECTION direction_ = DIRECTION::FORWARD;
-
-//     // flow control variables
-//     std::thread control_thread_;
-//     std::atomic<bool> running_ {false};
-//     std::atomic<bool> motor_started_ {false};
-//     uint32_t pid_frequency_rate_ = 0; // rate in milliseconds that PID will be executed.
-
-//     // delta_us_accum has last delta_us added to it, for each call of encoder_cb_, this helps
-//     // create the mean of deltas_us_ since last PID call.
-//     double delta_us_accum_ = 0;
-//     uint32_t delta_us_count_ = 0;
-//     std::chrono::steady_clock::time_point last_pid_tick_;
-//     std::mutex cb_mutex_;
-
-//     EncoderTickCallback callback_ {nullptr};
-
-//     // Current command variables
-//     MotorEncoder encoder_;
-//     PID pid_;
-//     Motor motor_;
-
-//     const double MIN_DELTA_US = 300;
-//     const double MAX_DELTA_US = 3000;
-
-//     /*
-//      * Connects to encoder and keeps statitics which is used to update
-//      * pid
-//      */
-//     void encoder_cb_(
-//         int gpio_pin,
-//         uint32_t delta_us,
-//         uint32_t tick,
-//         TickStatus tick_status)
-//     {
-//         // only worry about this condition during testing, under
-//         // production conditions if not healthy the code will need
-//         // to deal with it, in worse case this could mean stopping.
-//         //
-//         // Note that each encoder has two pins, therefore we can use one
-//         // as redundancy and accept that directon is probally known. So under
-//         // error conditions it is possilble to reset the en pin to the redundant
-//         // one.
-
-//         (void)gpio_pin;
-//         (void)tick;
-//         if (tick_status == TickStatus::HEALTHY && delta_us > MIN_DELTA_US && delta_us < MAX_DELTA_US) {
-//             // keep it really light only get mutex if something is changing.
-//             std::lock_guard<std::mutex> lock(cb_mutex_);
-//             delta_us_accum_ += delta_us;
-//             delta_us_count_++;
-//         }
-//     }
-
-//     /*
-//      * ran within timer to recompute motor duty cycle
-//      */
-//     void pid_cb_()
-//     {
-//         while (running_) {
-//             if (!motor_started_) {
-//                 std::this_thread::sleep_for(std::chrono::milliseconds(pid_frequency_rate_));
-//                 continue;
-//             }
-//             uint32_t measurement = 0;
-//             double target = 0;
-//             uint32_t delta_us_count = 0;
-//             {
-//                 std::lock_guard<std::mutex> lock(cb_mutex_);
-//                 delta_us_count = delta_us_count_;
-//                 measurement = (delta_us_count_ > 0) ? (delta_us_accum_ / delta_us_count_) : 0;
-//                 delta_us_accum_ = 0;
-//                 delta_us_count_ = 0;
-//                 target = target_nm_;
-//             }
-
-//             auto now = std::chrono::steady_clock::now();
-//             double dt = std::chrono::duration<double>(now - last_pid_tick_).count();
-//             last_pid_tick_ = now;
-
-//             if (delta_us_count > 0) {
-//                 int duty = pid_.compute(target, measurement, dt);
-//                 if (duty < MIN_DUTY) {
-//                     duty = MIN_DUTY; // Don't let it drop below spinning threshold
-//                 }
-//                 motor_.set_pwm(duty);
-//             }
-//             else {
-//                 /**
-//                  * If there is no duty cycle at all, set to the minimum that 
-//                  */
-//                 motor_.set_pwm(MIN_DUTY);
-//             }
-//             std::this_thread::sleep_for(std::chrono::milliseconds(pid_frequency_rate_));
-//         }
-//     }
-// };
-
 
 int main()
 {
-    // start motor controller.
-    // MotorController cntl;
-    // GpIoManager gpio;
+    // start motor controller
+    MotorController cntl;
+    GpIoManager gpio;
 
-    // std::cout << "configuring robot\n";
-    // if (cntl.on_configure(PWM_A, DIR_A, EN_P1_A, TIMEOUT, MIN_INTERVAL, PID_FREQUENCY, KP, KI, KD, PID_MIN, PID_MAX) == CallbackReturn::FAILURE) {
-    //     std::cout << "failed on configuration\n";
-    //     return 1;
-    // }
+    std::cout << "configuring robot\n";
+    if (cntl.on_configure(PWM_A, DIR_A, EN_P1_A, TIMEOUT, MIN_INTERVAL, PID_FREQUENCY, KP, KI, KD, PID_MIN, PID_MAX) == CallbackReturn::FAILURE) {
+        std::cout << "failed on configuration\n";
+        return 1;
+    }
 
     // std::cout << "activating robot\n";
-    // if (gpio.on_activate() == CallbackReturn::FAILURE) {
-    //     std::cout << "ERROR: Failed to initialize hardware\n";
-    //     return 1;
-    // }
-    // if (cntl.on_activate() == CallbackReturn::FAILURE) {
-    //     std::cout << "failed on activation\n";
-    //     cntl.on_deactivate();
-    //     return 1;
-    // }
+    if (gpio.on_activate() == CallbackReturn::FAILURE) {
+        std::cout << "ERROR: Failed to initialize hardware\n";
+        return 1;
+    }
+    if (cntl.on_activate() == CallbackReturn::FAILURE) {
+        std::cout << "failed on activation\n";
+        gpio.on_deactivate();
+        cntl.on_deactivate();
+        return 1;
+    }
 
-    // std::cout << "spinning motor 65%\n";
-    // cntl.start_motor();
-    // // run for 5 seconds @50%
-    // for (auto i = 0; i < 5; i++) {
-    //     cntl.subscribe(1000, DIRECTION::FORWARD);
-    //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    //     cntl.publish();
-    // }
-    // std::cout << "stopping motor\n";
-    // cntl.stop_motor();
-    // std::cout << "spinning motor 70%\n";
-    // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    // cntl.start_motor();
-    // for (auto i = 0; i < 5; i++) {
-    //     cntl.subscribe(700, DIRECTION::FORWARD);
-    //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    //     cntl.publish();
-    // }
-    // std::cout << "spinning motor 80%\n";
-    // for (auto i = 0; i < 5; i++) {
-    //     cntl.subscribe(400, DIRECTION::FORWARD);
-    //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    //     cntl.publish();
-    // }
+    std::cout << "spinning motor 65%\n";
+    // run for 5 seconds @65%
+    for (auto i = 0; i < 8; i++) {
+        cntl.publish(DIRECTION::FORWARD, 65);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        cntl.subscribe();
+    }
+    cntl.publish(DIRECTION::FORWARD, 0);
 
-    // cntl.on_deactivate();
-    // gpio.on_deactivate();
+    cntl.on_deactivate();
+    gpio.on_deactivate();
     return 0;
 }
