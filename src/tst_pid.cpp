@@ -75,7 +75,6 @@ class GpIoManager
 class MotorController
 {
   public:
-
     // TODO: Ignore PID variables kp, ki, kd, p_min, and p_max for now these will be re-introduced.
     CallbackReturn on_configure(
         const int pwm_pin,
@@ -96,34 +95,36 @@ class MotorController
 
         // configure motor, pid and encoder.
         if (motor_.on_configure(pwm_pin, dir_pin, 0) == CallbackReturn::FAILURE ||
-              encoder_.on_configure(en_pin, callback_, timeout, min_interval_us) == CallbackReturn::FAILURE) {
-              callback_ = nullptr;
-              return CallbackReturn::FAILURE;
+            encoder_.on_configure(en_pin, callback_, timeout, min_interval_us) == CallbackReturn::FAILURE) {
+            callback_ = nullptr;
+            return CallbackReturn::FAILURE;
         }
         pwm_pin_ = pwm_pin;
         return CallbackReturn::SUCCESS;
     }
 
-    CallbackReturn on_activate() {
+    CallbackReturn on_activate()
+    {
         if (motor_.on_activate() != CallbackReturn::SUCCESS) {
             return CallbackReturn::FAILURE;
         }
 
-        // dont rollback, this will call two deactivates for motor, 
+        // dont rollback, this will call two deactivates for motor,
         // which may not be what is needed.
         if (encoder_.on_activate() != CallbackReturn::SUCCESS) {
             return CallbackReturn::FAILURE;
         }
         running_.store(true, std::memory_order_release);
-        
+
         return CallbackReturn::SUCCESS;
     }
 
-    CallbackReturn on_deactivate() {
+    CallbackReturn on_deactivate()
+    {
         running_.store(false, std::memory_order_release);
         velocity_.store(0.0, std::memory_order_release);
-        auto enc_result = encoder_.on_deactivate();  // stop interrupts first
-        auto motor_result = motor_.on_deactivate();  // then stop PWM
+        auto enc_result = encoder_.on_deactivate(); // stop interrupts first
+        auto motor_result = motor_.on_deactivate(); // then stop PWM
         callback_ = nullptr;
         std::this_thread::sleep_for(std::chrono::microseconds(100));
 
@@ -133,17 +134,35 @@ class MotorController
         publish(DIRECTION::FORWARD, 0, 0);
 
         return (enc_result == CallbackReturn::SUCCESS && motor_result == CallbackReturn::SUCCESS)
-            ? CallbackReturn::SUCCESS : CallbackReturn::FAILURE;
+            ? CallbackReturn::SUCCESS
+            : CallbackReturn::FAILURE;
     }
 
-    void publish(DIRECTION direction, double duty_cycle, int freq) {
+    void publish(DIRECTION direction, double duty_cycle, int freq)
+    {
         motor_.set_direction(direction);
         motor_.set_pwm(freq, duty_cycle);
     }
 
     // velocity, duty_cycle, direction
-    void subscribe() {
+    void subscribe()
+    {
         std::cout << velocity_.load(std::memory_order_acquire) << "," << gpioGetPWMdutycycle(pwm_pin_) << "\n";
+    }
+
+    void print_diagnostics()
+    {
+        int total = total_pulses_.load();
+        int healthy = healthy_pulses_.load();
+        int triggers = boundary_triggers_.load();
+
+        std::cout << "Total pulses: " << total << "\n";
+        std::cout << "Healthy pulses: " << healthy << " ("
+                  << (100.0 * healthy / total) << "%)\n";
+        std::cout << "Rejected pulses: " << (total - healthy) << " ("
+                  << (100.0 * (total - healthy) / total) << "%)\n";
+        std::cout << "Boundary triggers: " << triggers << "\n";
+        std::cout << "Expected rotations: " << (total / PPR_) << "\n";
     }
 
   protected:
@@ -159,52 +178,62 @@ class MotorController
         if (!running_.load(std::memory_order_acquire)) {
             return;
         }
-        
-        // Increment pulse count (returns OLD value)
-        int old_delta_ct = delta_ct_.fetch_add(1, std::memory_order_acq_rel);
-        int new_delta_ct = old_delta_ct + 1;
-        
-        // Accumulate valid timing measurements
-        if (tick_status == TickStatus::HEALTHY && 
-            delta_us > MIN_DELTA_US && 
+
+        total_pulses_.fetch_add(1, std::memory_order_relaxed);
+
+        // Accumulate timing (ONCE!)
+        if (tick_status == TickStatus::HEALTHY &&
+            delta_us > MIN_DELTA_US &&
             delta_us < MAX_DELTA_US) {
-            
+            healthy_pulses_.fetch_add(1, std::memory_order_relaxed);
             delta_us_ct_.fetch_add(1, std::memory_order_acq_rel);
             delta_us_accum_.fetch_add(static_cast<uint64_t>(delta_us), std::memory_order_acq_rel);
         }
 
-        // Check if we've completed a full rotation
-        if (new_delta_ct == PPR_) {
-            int expected = PPR_;
+        // Atomic increment with boundary check
+        int old_count = delta_ct_.fetch_add(1, std::memory_order_acq_rel);
 
+        // Check if THIS interrupt brought us to exactly PPR
+        if (old_count == PPR_ - 1) {
+            boundary_triggers_.fetch_add(1, std::memory_order_relaxed);
+
+            int expected = PPR_;
             if (delta_ct_.compare_exchange_strong(expected, 0,
-                                          std::memory_order_acq_rel,
-                                          std::memory_order_acquire)) {
-                // Load accumulated values once
+                    std::memory_order_acq_rel,
+                    std::memory_order_acquire)) {
                 uint64_t accum = delta_us_accum_.load(std::memory_order_acquire);
                 int ct = delta_us_ct_.load(std::memory_order_acquire);
-                
-                // Reset counters for next rotation
+
                 delta_us_ct_.store(0, std::memory_order_release);
                 delta_us_accum_.store(0, std::memory_order_release);
-                
-                // Calculate velocity if we have valid measurements
+
                 if (accum > 0 && ct > 0) {
                     double avg_us = static_cast<double>(accum) / static_cast<double>(ct);
-                    velocity_.store(1'000'000.0 / (avg_us * PPR_), std::memory_order_release);
+                    double new_vel = 1'000'000.0 / (avg_us * PPR_);
+                    double current_vel = velocity_.load(std::memory_order_acquire);
+
+                    // Smooth with EMA (alpha = 0.3)
+                    double smoothed_vel = 0.7 * current_vel + 0.3 * new_vel;
+                    velocity_.store(smoothed_vel, std::memory_order_release);
                 }
             }
         }
     }
 
+
   private:
     // output variables
     std::atomic<double> velocity_ {0}; // velocity per rotation.
-    
+
+    // diagnoses variables
+    std::atomic<int> total_pulses_ {0};
+    std::atomic<int> healthy_pulses_ {0};
+    std::atomic<int> boundary_triggers_ {0};
+
     // state variables
-    std::atomic<int> delta_ct_ {0};  // count for each delta that has arrive (regardless of its in range or not)
-    std::atomic<int> delta_us_ct_{0};    // count of healthy delta ticks.
-    std::atomic<uint64_t> delta_us_accum_{0}; // accumulate deltas
+    std::atomic<int> delta_ct_ {0};            // count for each delta that has arrive (regardless of its in range or not)
+    std::atomic<int> delta_us_ct_ {0};         // count of healthy delta ticks.
+    std::atomic<uint64_t> delta_us_accum_ {0}; // accumulate deltas
     int pwm_pin_ = -1;
 
     // Drivers
@@ -218,9 +247,9 @@ class MotorController
     std::atomic<bool> running_ {false};
 
     // limit variables
-    const double MIN_DELTA_US{300};
-    const double MAX_DELTA_US{3000};
-    const int    PPR_{8};
+    const double MIN_DELTA_US {300};
+    const double MAX_DELTA_US {3000};
+    const int PPR_ {8};
 };
 
 
@@ -262,6 +291,7 @@ int main()
         cntl.subscribe();
     }
     cntl.publish(DIRECTION::FORWARD, 0, 0);
+    cntl.print_diagnostics();
 
 
     // std::cout << "spinning motor 65\% freq 2kHz\n";
