@@ -130,15 +130,15 @@ class MotorController
         delta_ct_.store(0, std::memory_order_release);
         delta_us_ct_.store(0, std::memory_order_release);
         delta_us_accum_.store(0, std::memory_order_release);
-        publish(DIRECTION::FORWARD, 0);
+        publish(DIRECTION::FORWARD, 0, 0);
 
         return (enc_result == CallbackReturn::SUCCESS && motor_result == CallbackReturn::SUCCESS)
             ? CallbackReturn::SUCCESS : CallbackReturn::FAILURE;
     }
 
-    void publish(DIRECTION direction, double duty_cycle) {
+    void publish(DIRECTION direction, double duty_cycle, int freq) {
         motor_.set_direction(direction);
-        motor_.set_pwm(duty_cycle);
+        motor_.set_pwm(freq, duty_cycle);
     }
 
     // velocity, duty_cycle, direction
@@ -174,8 +174,8 @@ class MotorController
         }
 
         // Check if we've completed a full rotation
-        if (new_delta_ct >= PPR_) {
-            int expected = new_delta_ct;
+        if (new_delta_ct == PPR_) {
+            int expected = PPR_;
 
             if (delta_ct_.compare_exchange_strong(expected, 0,
                                           std::memory_order_acq_rel,
@@ -185,7 +185,6 @@ class MotorController
                 int ct = delta_us_ct_.load(std::memory_order_acquire);
                 
                 // Reset counters for next rotation
-                delta_ct_.store(0, std::memory_order_release);
                 delta_us_ct_.store(0, std::memory_order_release);
                 delta_us_accum_.store(0, std::memory_order_release);
                 
@@ -249,14 +248,69 @@ int main()
         return 1;
     }
 
-    std::cout << "spinning motor 65%\n";
+    std::cout << "spinning motor 65\% freq 2Khz\n";
     // run for 5 seconds @65%
     for (auto i = 0; i < 8; i++) {
-        cntl.publish(DIRECTION::FORWARD, 65);
+        cntl.publish(DIRECTION::FORWARD, 65, 2000);
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         cntl.subscribe();
     }
-    cntl.publish(DIRECTION::FORWARD, 0);
+
+    for (auto i = 0; i < 8; i++) {
+        cntl.publish(DIRECTION::FORWARD, 75, 2000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        cntl.subscribe();
+    }
+    cntl.publish(DIRECTION::FORWARD, 0, 0);
+
+
+    // std::cout << "spinning motor 65\% freq 2kHz\n";
+    // // run for 5 seconds @65%
+    // for (auto i = 0; i < 8; i++) {
+    //     cntl.publish(DIRECTION::FORWARD, 65, 2000);
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    //     cntl.subscribe();
+    // }
+
+    // for (auto i = 0; i < 8; i++) {
+    //     cntl.publish(DIRECTION::FORWARD, 75, 2000);
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    //     cntl.subscribe();
+    // }
+    // cntl.publish(DIRECTION::FORWARD, 0, 0);
+
+
+    // std::this_thread::sleep_for(std::chrono::microseconds(1000));
+    // std::cout << "spinning motor 65\% freq 1.5kHz\n";
+    // // run for 5 seconds @65%
+    // for (auto i = 0; i < 8; i++) {
+    //     cntl.publish(DIRECTION::FORWARD, 65, 1500);
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    //     cntl.subscribe();
+    // }
+
+    // for (auto i = 0; i < 8; i++) {
+    //     cntl.publish(DIRECTION::FORWARD, 75, 1500);
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    //     cntl.subscribe();
+    // }
+    // cntl.publish(DIRECTION::FORWARD, 0, 0);
+
+    // std::this_thread::sleep_for(std::chrono::microseconds(1000));
+    // std::cout << "spinning motor 65\% freq 0.5kHz\n";
+    // // run for 5 seconds @65%
+    // for (auto i = 0; i < 8; i++) {
+    //     cntl.publish(DIRECTION::FORWARD, 65, 500);
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    //     cntl.subscribe();
+    // }
+
+    // for (auto i = 0; i < 8; i++) {
+    //     cntl.publish(DIRECTION::FORWARD, 75, 500);
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    //     cntl.subscribe();
+    // }
+    // cntl.publish(DIRECTION::FORWARD, 0, 0);
 
     cntl.on_deactivate();
     gpio.on_deactivate();

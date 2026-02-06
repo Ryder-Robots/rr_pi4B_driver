@@ -43,13 +43,15 @@ class Motor {
     // set the duty cycle to something that will work for testing.
     int set_pwm(int duty);
 
+    int set_pwm(int freq, int duty);
+
     
     CallbackReturn set_direction(DIRECTION dir);
 
     // This is not correct, but gives an idea of a method that interacts with
     // the hardware, this will be performed mostly likely through a ROS2 action.
 
-    private:
+ private:
     uint pwm_pin_ = 0; // set speed of the pin
     uint dir_pin_ = 0; // set direction.
     int pi_ = -1;
@@ -59,13 +61,13 @@ class Motor {
     // The TC78H660FTG brushed DC motor driver accepts input PWM frequencies from DC up to 400 kHz max. For optimal 
     // performance with small DC motors, use 500 Hz to 1 kHz. So going with a frequency of 1000Hz (1kHz), but want to 
     // make this adjustable, it could be something that PID algorithm adjusts on the fly.
-    int freq_ = 1000; // hardware real range for PWM pin 
+    // int freq_ = 1000; // hardware real range for PWM pin 
+    int freq_ = 700;
     
     // Keep the range of the between 0-100, if its found that more granulatity is needed this can always
     // be scaled down to give more range, say 0-1000 etc.
     const int DUTY_OFFSET = 10000;
 
-    int set_pwm(int freq, int duty);
 
     int set_mode_internal(uint pin, uint mode);
 };
