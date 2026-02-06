@@ -1,10 +1,14 @@
 # rr_pi4B_driver
-low level driver tests for Pi4B revision 1.5
 
+low level driver tests for Pi4B revision 1.5
 
 ## Installation
 
-reference: http://abyz.me.uk/rpi/pigpio/download.html
+Note that for this to work curerntly the delvelop branch of:
+
+<https://github.com/Ryder-Robots/pigpio> needs to be used.
+
+reference: <http://abyz.me.uk/rpi/pigpio/download.html>
 
 ```bash
 wget https://github.com/joan2937/pigpio/archive/master.zip
@@ -27,6 +31,7 @@ do visudo -f /etc/sudoers.d/gdb-nopasswd
 ```
 
 DEBUGGING
+
 ```bash
 sudo gdbserver :2345 build/tst_motor_enc
 
@@ -36,7 +41,7 @@ sudo gdbserver :2345 build/tst_motor_enc
 
 ### tst_motor_cntl vs tst_motor_ctl_pigiod
 
-It was found that using daemon produced PI_NOT_PERMITTED, this was not tested as sudo, since it should 
+It was found that using daemon produced PI_NOT_PERMITTED, this was not tested as sudo, since it should
 be running through daemon. Further investigation will be conducted to see if this is a software bug
 within client.
 
@@ -46,6 +51,7 @@ within client.
 sudo ./x_pigpio # check C I/F
 
 ```
+
 Results:
 
 ```
@@ -148,6 +154,7 @@ TEST  9.2  PASS (run script/script status: 201)
 TEST  9.3  PASS (run/stop script/script status: 110)
 TEST  9.4  PASS (delete script: 0)
 ```
+
 ### x_pigpiod_if2
 
 ```
@@ -374,7 +381,7 @@ WVCAP-d ok
 WVCAP-e ok
 ```
 
-### ./x_pipe 
+### ./x_pipe
 
 Results:
 
@@ -481,7 +488,7 @@ WVSP-b ok
 WVSP-c ok
 ```
 
-## Motor Testing 
+## Motor Testing
 
 The following was seen using tst_motor_simple.bash
 
@@ -513,3 +520,10 @@ Test 3: Motor A forward, Motor B reverse
 Test 4: Stop all motors
 ✅ All tests complete
 ```
+
+## Results of Pulse testing
+
+* Started with ±100% variance and race conditions
+* Fixed atomics and eliminated races
+* Removed duplicate accumulation bug
+* Achieved ±9-20% variance with 88% signal quality

@@ -18,6 +18,24 @@
           "ignoreFailures": true
         }
       ]
+    },
+    {
+      "name": "Debug tst_pid",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/tst_pid",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "MIMode": "gdb",
+      "miDebuggerServerAddress": "localhost:2345",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
     }
   ]
 }
